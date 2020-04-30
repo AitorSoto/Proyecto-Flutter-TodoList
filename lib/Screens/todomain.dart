@@ -2,15 +2,15 @@ import 'package:TodosApp/Screens/todolist.dart';
 import 'package:flutter/material.dart';
 
 class TodoMain extends StatelessWidget {
-  // This widget is the root of your application.
+  // This widget is the root of your application
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Todos',
-      theme: ThemeData(
-        primarySwatch: Colors.deepOrange,
-      ),
+      theme: ThemeData(),
+      darkTheme: ThemeData.dark(),
       home: MyHomePage(title: 'Todos'),
     );
   }

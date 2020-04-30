@@ -30,7 +30,6 @@ class TodoListState extends State {
       itemCount: count,
       itemBuilder: (BuildContext context, int position) {
         return Card(
-          color: Colors.white,
           elevation: 2.0,
           child: ListTile(
               leading: CircleAvatar(
