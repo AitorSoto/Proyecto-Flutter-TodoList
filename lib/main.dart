@@ -1,42 +1,79 @@
 import 'package:flutter/material.dart';
-import 'Screens/todolist.dart';
-import 'Util/dbhelper.dart';
+import 'package:curved_navigation_bar/curved_navigation_bar.dart';
+import 'package:flutter/services.Dart';
 import 'Model/todo.dart';
+import 'Screens/tododetail.dart';
+import 'Screens/todomain.dart';
 
-void main() => runApp(MyApp());
+void main() => runApp(MaterialApp(home: BottomNavBar()));
 
-class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
+class BottomNavBar extends StatefulWidget {
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Todos',
-      theme: ThemeData(
-        primarySwatch: Colors.deepOrange,
-      ),
-      home: MyHomePage(title: 'Todos'),
-    );
+  _BottomNavBarState createState() => _BottomNavBarState();
+}
+
+class _BottomNavBarState extends State<BottomNavBar> {
+  int pageIndex = 0;
+  GlobalKey _bottomNavigationKey = GlobalKey();
+  final TodoMain todoMain = TodoMain();
+  final TodoDetail todoDetail = TodoDetail(Todo('', 3, ''));
+
+  Widget _showPage = new TodoMain();
+  Widget _pageChooser(int page) {
+    switch (page) {
+      case 0:
+        return todoMain;
+        break;
+      case 1:
+        return todoDetail;
+        break;
+      default:
+        return Container(
+            child: new Center(
+                child: Text(
+          "No page found by chooser",
+          style: TextStyle(fontSize: 20.0),
+        )));
+    }
   }
-}
 
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
-
-  final String title;
-
-  @override
-  _MyHomePageState createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
-      appBar: new AppBar(
-        title: new Text(widget.title),
-      ),
-      body: TodoList(),
-    );
+    _portraitModeOnly();
+    return Scaffold(
+        bottomNavigationBar: CurvedNavigationBar(
+          key: _bottomNavigationKey,
+          index: pageIndex,
+          height: 50.0,
+          items: <Widget>[
+            Icon(Icons.list, size: 30),
+            Icon(Icons.add, size: 30),
+            Icon(Icons.compare_arrows, size: 30),
+            Icon(Icons.call_split, size: 30),
+            Icon(Icons.perm_identity, size: 30),
+          ],
+          color: Colors.white,
+          buttonBackgroundColor: Colors.red,
+          backgroundColor: Colors.white,
+          animationCurve: Curves.easeInOut,
+          animationDuration: Duration(milliseconds: 400),
+          onTap: (int tappedIndex) {
+            setState(() {
+              _showPage = _pageChooser(tappedIndex);
+            });
+          },
+        ),
+        body: Container(
+          color: Colors.orange,
+          child: Center(child: _showPage),
+        ));
+  }
+
+  void _portraitModeOnly() {
+    // Disable the option of rotate the screen
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
   }
 }

@@ -1,10 +1,10 @@
 import 'package:TodosApp/Model/todo.dart';
 import 'package:TodosApp/Util/dbhelper.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:intl/intl.dart';
 
 DbHelper helper = DbHelper();
+
 final List<String> choices = const <String>[
   'Save Todo & Back',
   'Delete Todo',
@@ -151,7 +151,6 @@ class TotoDetailState extends State {
     } else {
       helper.insertTodo(todo);
     }
-    Navigator.pop(context, true);
   }
 
   void updatePriority(String value) {

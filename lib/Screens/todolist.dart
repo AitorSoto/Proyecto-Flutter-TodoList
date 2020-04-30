@@ -22,13 +22,6 @@ class TodoListState extends State {
     }
     return Scaffold(
       body: todoListItems(),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          navigateToDetail(Todo('', 3, ''));
-        },
-        tooltip: "Add new Todo",
-        child: new Icon(Icons.add),
-      ),
     );
   }
 
