@@ -15,8 +15,6 @@ class BottomNavBar extends StatefulWidget {
 }
 
 class _BottomNavBarState extends State<BottomNavBar> {
-  Brightness brightness = Brightness.dark;
-
   int pageIndex = 0;
   GlobalKey _bottomNavigationKey = GlobalKey();
   TodoMain todoMain = TodoMain();
@@ -79,7 +77,6 @@ class _BottomNavBarState extends State<BottomNavBar> {
               },
             ),
             body: Container(
-              color: Colors.orange,
               child: Center(child: _showPage),
             )));
   }

@@ -17,7 +17,6 @@ class TodoSettingsState extends State {
         onChanged: (bool s) {
           setState(() {
             state = s;
-            debugPrint(state.toString());
           });
         },
       ),
