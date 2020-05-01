@@ -67,7 +67,6 @@ class TotoDetailState extends State {
     switch (value) {
       case mnuSave:
         save();
-        Navigator.pop(context, true);
         break;
       case mnuBack:
         Navigator.pop(context, true);
@@ -160,9 +159,7 @@ class TotoDetailState extends State {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(5.0),
                 border: Border.all(
-                    // color: Colors.grey,
-                    style: BorderStyle.solid,
-                    width: 1.0),
+                    color: Colors.grey, style: BorderStyle.solid, width: 1.0),
               ),
               child: ListTile(
                   title: DropdownButton<String>(

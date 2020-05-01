@@ -1,8 +1,8 @@
 import 'package:TodosApp/Model/todo.dart';
 import 'package:TodosApp/Screens/tododetail.dart';
 import 'package:TodosApp/Util/dbhelper.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:slide_popup_dialog/slide_popup_dialog.dart' as slideDialog;
 
 class TodoList extends StatefulWidget {
   @override
@@ -32,8 +32,6 @@ class TodoListState extends State {
   }
 
   ListView todoListItems() {
-    final _formKey = GlobalKey<FormState>();
-    TextStyle textStyle = Theme.of(context).textTheme.title;
     return ListView.builder(
       itemCount: count,
       itemBuilder: (BuildContext context, int position) {
@@ -41,106 +39,17 @@ class TodoListState extends State {
             elevation: 2.0,
             child: GestureDetector(
               onLongPress: () {
-                //navigateToDetail(this.todos[position]);
                 todo = this.todos[position];
                 titleController.text = todo.title;
                 descriptionController.text = todo.description;
-                showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        backgroundColor: Colors.grey[800],
-                        content: Stack(
-                          overflow: Overflow.visible,
-                          children: <Widget>[
-                            Positioned(
-                              right: -40.0,
-                              top: -40.0,
-                              child: InkResponse(
-                                onTap: () {
-                                  Navigator.of(context).pop();
-                                },
-                                child: CircleAvatar(
-                                  child: Icon(Icons.close),
-                                  backgroundColor: Colors.red,
-                                ),
-                              ),
-                            ),
-                            Form(
-                              key: _formKey,
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: <Widget>[
-                                  Padding(
-                                    padding: EdgeInsets.all(8.0),
-                                    child: TextField(
-                                      style: textStyle,
-                                      controller: titleController,
-                                      decoration: InputDecoration(
-                                          labelText: "Title",
-                                          labelStyle: textStyle,
-                                          border: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(5.0))),
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: EdgeInsets.all(8.0),
-                                    child: TextField(
-                                      controller: descriptionController,
-                                      style: textStyle,
-                                      decoration: InputDecoration(
-                                          labelText: "Description",
-                                          labelStyle: textStyle,
-                                          border: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(5.0))),
-                                    ),
-                                  ),
-                                  Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: ListTile(
-                                          title: DropdownButton<String>(
-                                        style: textStyle,
-                                        underline: Container(
-                                          height: 2,
-                                          color: Colors.black,
-                                        ),
-                                        onChanged: (value) =>
-                                            updatePriority(value),
-                                        items: _priorities
-                                            .map<DropdownMenuItem<String>>(
-                                                (String value) {
-                                          return DropdownMenuItem<String>(
-                                            value: value,
-                                            child: Text(value),
-                                          );
-                                        }).toList(),
-                                        value: retrievePriority(todo.priority),
-                                        icon: Icon(Icons.arrow_drop_down),
-                                        iconSize: 24,
-                                        elevation: 16,
-                                      ))),
-                                  RaisedButton(
-                                      child:
-                                          Text("Update Todo", style: textStyle),
-                                      onPressed: null)
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    });
+                showDialog();
               },
               child: ListTile(
-                  leading: CircleAvatar(
-                      backgroundColor: getColor(this.todos[position].priority)),
-                  title: Text(this.todos[position].title),
-                  subtitle: Text(this.todos[position].date),
-                  onTap: () {
-                    navigateToDetail(this.todos[position]);
-                  }),
+                leading: CircleAvatar(
+                    backgroundColor: getColor(this.todos[position].priority)),
+                title: Text(this.todos[position].title),
+                subtitle: Text(this.todos[position].date),
+              ),
             ));
       },
     );
@@ -268,6 +177,75 @@ class TodoListState extends State {
                 elevation: 16,
               )))
         ],
+      ),
+    );
+  }
+
+  void showDialog() {
+    final _formKey = GlobalKey<FormState>();
+    TextStyle textStyle = Theme.of(context).textTheme.title;
+    slideDialog.showSlideDialog(
+      context: context,
+      backgroundColor: const Color(0xff5A5A5A),
+      child: Form(
+        key: _formKey,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.all(8.0),
+              child: TextField(
+                style: textStyle,
+                controller: titleController,
+                decoration: InputDecoration(
+                    labelText: "Title",
+                    labelStyle: textStyle,
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(5.0))),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.all(8.0),
+              child: TextField(
+                controller: descriptionController,
+                style: textStyle,
+                decoration: InputDecoration(
+                    labelText: "Description",
+                    labelStyle: textStyle,
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(5.0))),
+              ),
+            ),
+            Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ListTile(
+                    title: DropdownButton<String>(
+                  style: textStyle,
+                  underline: Container(
+                    height: 2,
+                    color: Colors.grey[800],
+                  ),
+                  onChanged: (value) => updatePriority(value),
+                  items:
+                      _priorities.map<DropdownMenuItem<String>>((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value),
+                    );
+                  }).toList(),
+                  value: retrievePriority(todo.priority),
+                  icon: Icon(Icons.arrow_drop_down),
+                  iconSize: 24,
+                  elevation: 16,
+                ))),
+            RaisedButton(
+                child: Text("Update Todo", style: textStyle), onPressed: null),
+            RaisedButton(
+              child: Text("Delete todo", style: textStyle),
+              onPressed: null,
+            )
+          ],
+        ),
       ),
     );
   }
