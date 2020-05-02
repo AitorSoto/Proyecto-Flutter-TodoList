@@ -90,13 +90,13 @@ class TodoListState extends State {
     }
   }
 
-  void navigateToDetail(Todo todo) async {
+  /*void reload() async {
     bool result = await Navigator.push(
-        context, MaterialPageRoute(builder: (context) => TodoDetail(todo)));
+        context, MaterialPageRoute(builder: (context) => TodoList()));
     if (result == true) {
       getData();
     }
-  }
+  }*/
 
   void updatePriority(String value) {
     switch (value) {
@@ -238,12 +238,40 @@ class TodoListState extends State {
                   iconSize: 24,
                   elevation: 16,
                 ))),
-            RaisedButton(
-                child: Text("Update Todo", style: textStyle), onPressed: null),
-            RaisedButton(
-              child: Text("Delete todo", style: textStyle),
-              onPressed: null,
-            )
+            Center(
+                child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                Padding(
+                    padding: EdgeInsets.only(top: 30.0, right: 10.0),
+                    child: RaisedButton(
+                      onPressed: () async {
+                        int result;
+                        if (todo.id != null) {
+                          result = await helper.updateTodo(todo);
+                          //reload();
+                        }
+                      },
+                      child: Text("Update Todo"),
+                      color: Colors.blue,
+                    )),
+                Padding(
+                    padding: EdgeInsets.only(top: 30.0),
+                    child: RaisedButton(
+                      onPressed: () async {
+                        int result;
+                        Navigator.pop(context, true);
+                        if (todo.id == null) {
+                          return;
+                        }
+                        result = await helper.deleteTodo(todo.id);
+                      },
+                      child: Text("Delete Todo"),
+                      color: Colors.red,
+                    ))
+              ],
+            ))
           ],
         ),
       ),

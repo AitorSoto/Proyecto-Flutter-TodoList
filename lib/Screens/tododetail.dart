@@ -1,11 +1,13 @@
 import 'package:TodosApp/Model/todo.dart';
+import 'package:TodosApp/Screens/todomain.dart';
 import 'package:TodosApp/Util/dbhelper.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 DbHelper helper = DbHelper();
 
-final List<String> choices = const <String>[
+/*final List<String> choices = const <String>[
   'Save Todo & Back',
   'Delete Todo',
   'Back to List'
@@ -13,7 +15,7 @@ final List<String> choices = const <String>[
 
 const mnuSave = 'Save Todo & Back';
 const mnuDelete = 'Delete Todo';
-const mnuBack = 'Back to List';
+const mnuBack = 'Back to List';*/
 
 class TodoDetail extends StatefulWidget {
   final Todo todo;
@@ -44,7 +46,7 @@ class TotoDetailState extends State {
           appBar: AppBar(
             automaticallyImplyLeading: false,
             title: todo.title.isEmpty ? Text('Create Todo') : Text(todo.title),
-            actions: <Widget>[
+            /*actions: <Widget>[
               PopupMenuButton<String>(
                 onSelected: select,
                 itemBuilder: (BuildContext context) {
@@ -56,13 +58,13 @@ class TotoDetailState extends State {
                   }).toList();
                 },
               )
-            ],
+            ],*/
           ),
           body: formTodo(), // Returns todo's form
         ));
   }
 
-  void select(String value) async {
+  /*void select(String value) async {
     int result;
     switch (value) {
       case mnuSave:
@@ -86,14 +88,26 @@ class TotoDetailState extends State {
         }
         break;
     }
-  }
+  }*/
 
   void save() {
-    todo.date = new DateFormat.yMd().format(DateTime.now());
-    if (todo.id != null) {
-      helper.updateTodo(todo);
-    } else {
+    TextStyle textStyle = Theme.of(context).textTheme.title;
+    if (todo.title.isNotEmpty && todo.description.isNotEmpty) {
+      todo.date = new DateFormat.yMd().format(DateTime.now());
       helper.insertTodo(todo);
+    } else {
+      AlertDialog alertDialog = AlertDialog(
+        title: Text(
+          "Look at the text boxes",
+          style: textStyle,
+        ),
+        content: Text(
+          "Maybe one or both are empty",
+          style: DefaultTextStyle.of(context).style.apply(fontSizeFactor: 1.25),
+        ),
+        backgroundColor: Colors.grey[700],
+      );
+      showDialog(context: context, builder: (_) => alertDialog);
     }
   }
 
@@ -182,9 +196,36 @@ class TotoDetailState extends State {
                 icon: Icon(Icons.arrow_drop_down),
                 iconSize: 24,
                 elevation: 16,
-              )))
+              ))),
+          Center(
+              child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              Padding(
+                  padding: EdgeInsets.only(top: 30.0, right: 10.0),
+                  child: RaisedButton(
+                    onPressed: () => save(),
+                    child: Text("Save Todo"),
+                  )),
+              Padding(
+                  padding: EdgeInsets.only(top: 30.0),
+                  child: RaisedButton(
+                    onPressed: () => cancelTodo(),
+                    child: Text("Cancel Todo"),
+                    color: Colors.red,
+                  ))
+            ],
+          ))
         ],
       ),
     );
+  }
+
+  void cancelTodo() {
+    todo.title = "";
+    todo.description = "";
+    titleController.text = "";
+    descriptionController.text = "";
   }
 }

@@ -69,8 +69,9 @@ class DbHelper {
         "', $colPriority = '" +
         todo.priority.toString() +
         "' " +
-        "WHERE id =  " +
-        todo.id.toString());
+        "WHERE $colId = '" +
+        todo.id.toString() +
+        "'");
     return result;
   }
 
