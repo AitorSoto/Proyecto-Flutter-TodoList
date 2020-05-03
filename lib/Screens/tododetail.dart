@@ -1,21 +1,20 @@
+import 'dart:ffi';
+import 'dart:typed_data';
+
 import 'package:TodosApp/Model/todo.dart';
-import 'package:TodosApp/Screens/todomain.dart';
 import 'package:TodosApp/Util/dbhelper.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:intl/intl.dart';
+import 'package:TodosApp/Util/notificationmanager.dart';
+import 'package:giffy_dialog/giffy_dialog.dart';
 
 DbHelper helper = DbHelper();
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
 
-/*final List<String> choices = const <String>[
-  'Save Todo & Back',
-  'Delete Todo',
-  'Back to List'
-];
-
-const mnuSave = 'Save Todo & Back';
-const mnuDelete = 'Delete Todo';
-const mnuBack = 'Back to List';*/
+NotificationManager manager = NotificationManager();
 
 class TodoDetail extends StatefulWidget {
   final Todo todo;
@@ -32,6 +31,17 @@ class TotoDetailState extends State {
   String _priority = "Low";
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
+  DateTime date = DateTime.now(); // For datepicker
+  TimeOfDay time = TimeOfDay.now(); // For hourpicker
+
+  final List<Key> keys = [
+    Key("Network"),
+    Key("NetworkDialog"),
+    Key("Flare"),
+    Key("FlareDialog"),
+    Key("Asset"),
+    Key("AssetDialog")
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -64,50 +74,19 @@ class TotoDetailState extends State {
         ));
   }
 
-  /*void select(String value) async {
-    int result;
-    switch (value) {
-      case mnuSave:
-        save();
-        break;
-      case mnuBack:
-        Navigator.pop(context, true);
-        break;
-      case mnuDelete:
-        Navigator.pop(context, true);
-        if (todo.id == null) {
-          return;
-        }
-        result = await helper.deleteTodo(todo.id);
-        if (result != 0) {
-          AlertDialog alertDialog = AlertDialog(
-            title: Text("Delete Todo"),
-            content: Text("The Todo has been deleted"),
-          );
-          showDialog(context: context, builder: (_) => alertDialog);
-        }
-        break;
-    }
-  }*/
-
-  void save() {
+  void save(bool showDialog) {
     TextStyle textStyle = Theme.of(context).textTheme.title;
     if (todo.title.isNotEmpty && todo.description.isNotEmpty) {
       todo.date = new DateFormat.yMd().format(DateTime.now());
       helper.insertTodo(todo);
+      if (showDialog)
+        showDialogMethod("Success!", "The todo was added successfully",
+            "https://i.pinimg.com/originals/e8/06/52/e80652af2c77e3a73858e16b2ffe5f9a.gif");
     } else {
-      AlertDialog alertDialog = AlertDialog(
-        title: Text(
-          "Look at the text boxes",
-          style: textStyle,
-        ),
-        content: Text(
-          "Maybe one or both are empty",
-          style: DefaultTextStyle.of(context).style.apply(fontSizeFactor: 1.25),
-        ),
-        backgroundColor: Colors.grey[700],
-      );
-      showDialog(context: context, builder: (_) => alertDialog);
+      showDialogMethod(
+          "Information not valid!!",
+          'There is a problem with the text fields, one or both text fields are empty. Dont be the cat of above :D',
+          "https: //i.pinimg.com/originals/e8/06/52/e80652af2c77e3a73858e16b2ffe5f9a.gif");
     }
   }
 
@@ -177,13 +156,7 @@ class TotoDetailState extends State {
               ),
               child: ListTile(
                   title: DropdownButton<String>(
-                style: TextStyle(
-                    //color: Colors.black,
-                    fontSize: 18),
-                underline: Container(
-                  height: 2,
-                  color: Colors.black,
-                ),
+                style: textStyle,
                 onChanged: (value) => updatePriority(value),
                 items:
                     _priorities.map<DropdownMenuItem<String>>((String value) {
@@ -193,7 +166,11 @@ class TotoDetailState extends State {
                   );
                 }).toList(),
                 value: retrievePriority(todo.priority),
-                icon: Icon(Icons.arrow_drop_down),
+                icon: Icon(
+                  Icons.arrow_drop_down,
+                  size: 25.0,
+                  color: Colors.white,
+                ),
                 iconSize: 24,
                 elevation: 16,
               ))),
@@ -205,7 +182,7 @@ class TotoDetailState extends State {
               Padding(
                   padding: EdgeInsets.only(top: 30.0, right: 10.0),
                   child: RaisedButton(
-                    onPressed: () => save(),
+                    onPressed: () => save(true),
                     child: Text("Save Todo"),
                   )),
               Padding(
@@ -214,6 +191,22 @@ class TotoDetailState extends State {
                     onPressed: () => cancelTodo(),
                     child: Text("Cancel Todo"),
                     color: Colors.red,
+                  )),
+              Padding(
+                  padding: EdgeInsets.only(top: 30.0, left: 10.0),
+                  child: RaisedButton(
+                    onPressed: () {
+                      if (titleController.text.isNotEmpty &&
+                          titleController.text.isNotEmpty)
+                        _showDateTimePicker();
+                      else
+                        showDialogMethod(
+                            "This man is looking where the money went, and like him, we are looking for what you want to be notified about.",
+                            "Tell us about you want to be notified by filling in the fields of title and description",
+                            "https://media1.tenor.com/images/859f1642b89fb829d2ff6a08d708b437/tenor.gif?itemid=13868803");
+                    },
+                    child: Text("Notification"),
+                    color: Colors.purple,
                   ))
             ],
           ))
@@ -222,10 +215,75 @@ class TotoDetailState extends State {
     );
   }
 
+  void showDialogMethod(String title, String description, String urlGif) {
+    showDialog(
+        context: context,
+        builder: (_) => NetworkGiffyDialog(
+              key: keys[1],
+              image: Image.network(
+                urlGif,
+                fit: BoxFit.cover,
+              ),
+              entryAnimation: EntryAnimation.TOP_LEFT,
+              title: Text(
+                title,
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.w600),
+              ),
+              description: Text(
+                description,
+                textAlign: TextAlign.center,
+              ),
+              onOkButtonPressed: () =>
+                  Navigator.of(context, rootNavigator: true).pop('dialog'),
+            ));
+  }
+
   void cancelTodo() {
     todo.title = "";
     todo.description = "";
     titleController.text = "";
     descriptionController.text = "";
+  }
+
+  Future<void> _scheduleNotification(
+      String title, String description, DateTime dateNotificaction) async {
+    var vibrationPattern = Int64List(4);
+    vibrationPattern[0] = 0;
+    vibrationPattern[1] = 1000;
+    vibrationPattern[2] = 5000;
+    vibrationPattern[3] = 2000;
+
+    var androidPlatformChannelSpecifics = AndroidNotificationDetails(
+        '1', 'Todos channel', 'Alternative Todos channel',
+        vibrationPattern: vibrationPattern,
+        enableLights: true,
+        color: const Color.fromARGB(255, 85, 129, 255),
+        ledColor: const Color.fromARGB(255, 85, 129, 255),
+        ledOnMs: 1000,
+        ledOffMs: 500);
+    var iOSPlatformChannelSpecifics =
+        IOSNotificationDetails(sound: 'slow_spring_board.aiff');
+    var platformChannelSpecifics = NotificationDetails(
+        androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
+    await flutterLocalNotificationsPlugin.schedule(
+        0, title, description, dateNotificaction, platformChannelSpecifics);
+    showDialogMethod(
+        "Success!",
+        "Youll be notificated the day ${dateNotificaction.day}/${dateNotificaction.month}/${dateNotificaction.year} at " +
+            "${dateNotificaction.hour}:${dateNotificaction.minute}. The todo has been saved",
+        "https://1.bp.blogspot.com/-ng6yNqIKDJ4/VIIagImcDeI/AAAAAAAADlo/rjXhLx5Eyyc/s1600/c9bd7a16beae0bd10b56eb511434b73c.jpg");
+    save(false);
+  }
+
+  Future<void> _showDateTimePicker() async {
+    DatePicker.showDateTimePicker(context,
+        showTitleActions: true,
+        minTime: DateTime.now(),
+        maxTime: DateTime(date.year + 2, date.month, date.day),
+        onConfirm: (date) {
+      print("Confirmado $date");
+      _scheduleNotification(todo.title, todo.description, date);
+    }, locale: LocaleType.en);
   }
 }

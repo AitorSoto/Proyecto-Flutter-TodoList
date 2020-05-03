@@ -1,4 +1,4 @@
-import 'package:TodosApp/Screens/loginpage.dart';
+import 'package:TodosApp/Screens/searchpage.dart';
 import 'package:TodosApp/Screens/todosettings.dart';
 import 'package:flutter/material.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
@@ -20,7 +20,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
   TodoMain todoMain = TodoMain();
   final TodoDetail todoDetail = TodoDetail(Todo('', 3, ''));
   final TodoSettings todoSettings = TodoSettings();
-  final LoginPage loginPage = LoginPage();
+  final SearchPage searchPage = SearchPage();
 
   Widget _showPage = new TodoMain();
   Widget _pageChooser(int page) {
@@ -32,7 +32,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
         return todoDetail;
         break;
       case 2:
-        return loginPage;
+        return searchPage;
         break;
       case 4:
         return todoSettings;
@@ -61,11 +61,11 @@ class _BottomNavBarState extends State<BottomNavBar> {
               items: <Widget>[
                 Icon(Icons.list, size: 30),
                 Icon(Icons.add, size: 30),
-                Icon(Icons.compare_arrows, size: 30),
-                Icon(Icons.call_split, size: 30),
-                Icon(Icons.perm_identity, size: 30),
+                Icon(Icons.search, size: 30),
+                Icon(Icons.graphic_eq, size: 30),
+                Icon(Icons.account_box, size: 30),
               ],
-              color: Colors.black,
+              color: Colors.blueGrey,
               buttonBackgroundColor: Colors.blueAccent,
               backgroundColor: Colors.grey,
               animationCurve: Curves.easeInOut,

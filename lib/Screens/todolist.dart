@@ -1,5 +1,4 @@
 import 'package:TodosApp/Model/todo.dart';
-import 'package:TodosApp/Screens/tododetail.dart';
 import 'package:TodosApp/Util/dbhelper.dart';
 import 'package:flutter/material.dart';
 import 'package:slide_popup_dialog/slide_popup_dialog.dart' as slideDialog;
@@ -145,37 +144,6 @@ class TodoListState extends State {
                     border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(5.0))),
               )),
-          Container(
-              width: 125,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(5.0),
-                border: Border.all(
-                    // color: Colors.grey,
-                    style: BorderStyle.solid,
-                    width: 1.0),
-              ),
-              child: ListTile(
-                  title: DropdownButton<String>(
-                style: TextStyle(
-                    //color: Colors.black,
-                    fontSize: 18),
-                underline: Container(
-                  height: 2,
-                  color: Colors.black,
-                ),
-                onChanged: (value) => updatePriority(value),
-                items:
-                    _priorities.map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
-                value: retrievePriority(todo.priority),
-                icon: Icon(Icons.arrow_drop_down),
-                iconSize: 24,
-                elevation: 16,
-              )))
         ],
       ),
     );
@@ -186,7 +154,7 @@ class TodoListState extends State {
     TextStyle textStyle = Theme.of(context).textTheme.title;
     slideDialog.showSlideDialog(
       context: context,
-      backgroundColor: const Color(0xff5A5A5A),
+      backgroundColor: Colors.blueGrey,
       child: Form(
         key: _formKey,
         child: Column(
@@ -216,15 +184,21 @@ class TodoListState extends State {
                         borderRadius: BorderRadius.circular(5.0))),
               ),
             ),
-            Padding(
-                padding: const EdgeInsets.all(8.0),
+            Container(
+                width: 125,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(5.0),
+                  border: Border.all(
+                      color: Colors.black,
+                      style: BorderStyle.solid,
+                      width: 1.0),
+                ),
                 child: ListTile(
                     title: DropdownButton<String>(
-                  style: textStyle,
-                  underline: Container(
-                    height: 2,
-                    color: Colors.grey[800],
-                  ),
+                  style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 17,
+                      fontWeight: FontWeight.bold),
                   onChanged: (value) => updatePriority(value),
                   items:
                       _priorities.map<DropdownMenuItem<String>>((String value) {
@@ -234,7 +208,11 @@ class TodoListState extends State {
                     );
                   }).toList(),
                   value: retrievePriority(todo.priority),
-                  icon: Icon(Icons.arrow_drop_down),
+                  icon: Icon(
+                    Icons.arrow_drop_down,
+                    size: 25.0,
+                    color: Colors.black,
+                  ),
                   iconSize: 24,
                   elevation: 16,
                 ))),
@@ -250,7 +228,8 @@ class TodoListState extends State {
                         int result;
                         if (todo.id != null) {
                           result = await helper.updateTodo(todo);
-                          //reload();
+                          Navigator.of(context, rootNavigator: true)
+                              .pop('dialog');
                         }
                       },
                       child: Text("Update Todo"),
@@ -261,7 +240,6 @@ class TodoListState extends State {
                     child: RaisedButton(
                       onPressed: () async {
                         int result;
-                        Navigator.pop(context, true);
                         if (todo.id == null) {
                           return;
                         }
