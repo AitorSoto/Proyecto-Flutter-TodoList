@@ -47,16 +47,12 @@ class TotoDetailState extends State {
   Widget build(BuildContext context) {
     titleController.text = todo.title;
     descriptionController.text = todo.description;
-    return WillPopScope(
-        // If user go back the todo wont update
-        onWillPop: () {
-          // If user try to go back app wont do nothing to avoid errors
-        },
-        child: Scaffold(
-          appBar: AppBar(
-            automaticallyImplyLeading: false,
-            title: todo.title.isEmpty ? Text('Create Todo') : Text(todo.title),
-            /*actions: <Widget>[
+
+    return Scaffold(
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        title: Text('Create Todo'),
+        /*actions: <Widget>[
               PopupMenuButton<String>(
                 onSelected: select,
                 itemBuilder: (BuildContext context) {
@@ -69,16 +65,15 @@ class TotoDetailState extends State {
                 },
               )
             ],*/
-          ),
-          body: formTodo(), // Returns todo's form
-        ));
+      ),
+      body: formTodo(), // Returns todo's form
+    );
   }
 
   void save(bool showDialog) {
-    TextStyle textStyle = Theme.of(context).textTheme.title;
     if (todo.title.isNotEmpty && todo.description.isNotEmpty) {
       todo.date = new DateFormat.yMd().format(DateTime.now());
-      helper.insertTodo(todo);
+      helper.insertTodo(todo).then((_) => cancelTodo());
       if (showDialog)
         showDialogMethod("Success!", "The todo was added successfully",
             "https://i.pinimg.com/originals/e8/06/52/e80652af2c77e3a73858e16b2ffe5f9a.gif");
@@ -86,7 +81,7 @@ class TotoDetailState extends State {
       showDialogMethod(
           "Information not valid!!",
           'There is a problem with the text fields, one or both text fields are empty. Dont be the cat of above :D',
-          "https: //i.pinimg.com/originals/e8/06/52/e80652af2c77e3a73858e16b2ffe5f9a.gif");
+          "https://media1.tenor.com/images/36bebe7fb9f5cc3fd3391e55f5c4c7f1/tenor.gif");
     }
   }
 
@@ -192,23 +187,22 @@ class TotoDetailState extends State {
                     child: Text("Cancel Todo"),
                     color: Colors.red,
                   )),
-              Padding(
-                  padding: EdgeInsets.only(top: 30.0, left: 10.0),
-                  child: RaisedButton(
-                    onPressed: () {
-                      if (titleController.text.isNotEmpty &&
-                          titleController.text.isNotEmpty)
-                        _showDateTimePicker();
-                      else
-                        showDialogMethod(
-                            "This man is looking where the money went, and like him, we are looking for what you want to be notified about.",
-                            "Tell us about you want to be notified by filling in the fields of title and description",
-                            "https://media1.tenor.com/images/859f1642b89fb829d2ff6a08d708b437/tenor.gif?itemid=13868803");
-                    },
-                    child: Text("Notification"),
-                    color: Colors.purple,
-                  ))
             ],
+          )),
+          Center(
+              child: RaisedButton(
+            onPressed: () {
+              if (titleController.text.isNotEmpty &&
+                  titleController.text.isNotEmpty)
+                _showDateTimePicker();
+              else
+                showDialogMethod(
+                    "This man is looking where the money went, and like him, we are looking for what you want to be notified about.",
+                    "Tell us about you want to be notified by filling in the fields of title and description",
+                    "https://media1.tenor.com/images/859f1642b89fb829d2ff6a08d708b437/tenor.gif?itemid=13868803");
+            },
+            child: Text("Set a notification and save"),
+            color: Colors.purple,
           ))
         ],
       ),
@@ -267,7 +261,7 @@ class TotoDetailState extends State {
     var platformChannelSpecifics = NotificationDetails(
         androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
     await flutterLocalNotificationsPlugin.schedule(
-        0, title, description, dateNotificaction, platformChannelSpecifics);
+        0, title, description, dateNotificaction, platformChannelSpecifics,);
     showDialogMethod(
         "Success!",
         "Youll be notificated the day ${dateNotificaction.day}/${dateNotificaction.month}/${dateNotificaction.year} at " +

@@ -37,7 +37,7 @@ class TodoListState extends State {
         return Card(
             elevation: 2.0,
             child: GestureDetector(
-              onLongPress: () {
+              onTap: () {
                 todo = this.todos[position];
                 titleController.text = todo.title;
                 descriptionController.text = todo.description;
@@ -89,15 +89,8 @@ class TodoListState extends State {
     }
   }
 
-  /*void reload() async {
-    bool result = await Navigator.push(
-        context, MaterialPageRoute(builder: (context) => TodoList()));
-    if (result == true) {
-      getData();
-    }
-  }*/
-
   void updatePriority(String value) {
+    print(todo.priority);
     switch (value) {
       case "High":
         todo.priority = 1;
@@ -115,6 +108,7 @@ class TodoListState extends State {
   }
 
   String retrievePriority(int value) {
+    print(value.toString());
     return _priorities[value - 1];
   }
 
@@ -154,7 +148,7 @@ class TodoListState extends State {
     TextStyle textStyle = Theme.of(context).textTheme.title;
     slideDialog.showSlideDialog(
       context: context,
-      backgroundColor: Colors.blueGrey,
+      backgroundColor: Color(0xFF39A9DB),
       child: Form(
         key: _formKey,
         child: Column(
@@ -195,10 +189,7 @@ class TodoListState extends State {
                 ),
                 child: ListTile(
                     title: DropdownButton<String>(
-                  style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 17,
-                      fontWeight: FontWeight.bold),
+                  style: TextStyle(color: Colors.black, fontSize: 16.0),
                   onChanged: (value) => updatePriority(value),
                   items:
                       _priorities.map<DropdownMenuItem<String>>((String value) {
@@ -211,7 +202,7 @@ class TodoListState extends State {
                   icon: Icon(
                     Icons.arrow_drop_down,
                     size: 25.0,
-                    color: Colors.black,
+                    color: Colors.white,
                   ),
                   iconSize: 24,
                   elevation: 16,
@@ -227,7 +218,10 @@ class TodoListState extends State {
                       onPressed: () async {
                         int result;
                         if (todo.id != null) {
+                          todo.title = titleController.text;
+                          todo.description = descriptionController.text;
                           result = await helper.updateTodo(todo);
+                          getData();
                           Navigator.of(context, rootNavigator: true)
                               .pop('dialog');
                         }
@@ -244,6 +238,9 @@ class TodoListState extends State {
                           return;
                         }
                         result = await helper.deleteTodo(todo.id);
+                        getData();
+                        Navigator.of(context, rootNavigator: true)
+                            .pop('dialog');
                       },
                       child: Text("Delete Todo"),
                       color: Colors.red,

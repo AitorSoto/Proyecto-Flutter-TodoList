@@ -65,9 +65,9 @@ class _BottomNavBarState extends State<BottomNavBar> {
                 Icon(Icons.graphic_eq, size: 30),
                 Icon(Icons.account_box, size: 30),
               ],
-              color: Colors.blueGrey,
-              buttonBackgroundColor: Colors.blueAccent,
-              backgroundColor: Colors.grey,
+              color: Color(0xFF39A9DB),
+              buttonBackgroundColor: Color(0xFF2AB7CA),
+              backgroundColor: Color(0xFF39A9DB),
               animationCurve: Curves.easeInOut,
               animationDuration: Duration(milliseconds: 400),
               onTap: (int tappedIndex) {
