@@ -1,4 +1,4 @@
-import 'package:TodosApp/Screens/searchpage.dart';
+import 'package:TodosApp/Screens/todolist.dart';
 import 'package:TodosApp/Screens/todosettings.dart';
 import 'package:flutter/material.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
@@ -6,6 +6,7 @@ import 'package:flutter/services.Dart';
 import 'Model/todo.dart';
 import 'Screens/tododetail.dart';
 import 'Screens/todomain.dart';
+import 'Screens/todospage.dart';
 
 void main() => runApp(MaterialApp(home: BottomNavBar()));
 
@@ -20,22 +21,21 @@ class _BottomNavBarState extends State<BottomNavBar> {
   TodoMain todoMain = TodoMain();
   final TodoDetail todoDetail = TodoDetail(Todo('', 3, ''));
   final TodoSettings todoSettings = TodoSettings();
-  final SearchPage searchPage = SearchPage();
+  final DataGraphic dataGraphic = DataGraphic();
+  final TodosPage todosPage = TodosPage();
 
   Widget _showPage = new TodoMain();
   Widget _pageChooser(int page) {
     switch (page) {
       case 0:
-        return todoMain;
+        return todosPage;
         break;
       case 1:
         return todoDetail;
         break;
       case 2:
-        return searchPage;
+        return dataGraphic;
         break;
-      case 4:
-        return todoSettings;
       default:
         return Container(
             child: new Center(
@@ -61,12 +61,12 @@ class _BottomNavBarState extends State<BottomNavBar> {
               items: <Widget>[
                 Icon(Icons.list, size: 30),
                 Icon(Icons.add, size: 30),
-                Icon(Icons.search, size: 30),
                 Icon(Icons.graphic_eq, size: 30),
-                Icon(Icons.account_box, size: 30),
+                Icon(Icons.account_circle, size: 30),
+                //Icon(Icons.account_box, size: 30),
               ],
               color: Color(0xFF39A9DB),
-              buttonBackgroundColor: Color(0xFF2AB7CA),
+              buttonBackgroundColor: Color(0xFF323BFF),
               backgroundColor: Color(0xFF39A9DB),
               animationCurve: Curves.easeInOut,
               animationDuration: Duration(milliseconds: 400),

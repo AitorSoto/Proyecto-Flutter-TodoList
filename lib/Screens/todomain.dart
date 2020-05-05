@@ -1,6 +1,6 @@
 import 'package:TodosApp/Screens/todolist.dart';
+import 'package:TodosApp/Screens/todospage.dart';
 import 'package:flutter/material.dart';
-import 'package:search_app_bar/search_app_bar.dart';
 
 class TodoMain extends StatelessWidget {
   // This widget is the root of your application
@@ -28,10 +28,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-      appBar: new AppBar(
-        title: new Text(widget.title),
-      ),
-      body: TodoList(),
+      body: TodosPage(),
     );
   }
 }
