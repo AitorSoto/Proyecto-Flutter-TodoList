@@ -36,6 +36,9 @@ class _BottomNavBarState extends State<BottomNavBar> {
       case 2:
         return dataGraphic;
         break;
+      case 3:
+        return todoSettings;
+        break;
       default:
         return Container(
             child: new Center(

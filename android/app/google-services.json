@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "176422357432",
+    "firebase_url": "https://app-tareas-23d63.firebaseio.com",
+    "project_id": "app-tareas-23d63",
+    "storage_bucket": "app-tareas-23d63.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:176422357432:android:3e422b9124e6168d15e74d",
+        "android_client_info": {
+          "package_name": "com.example.todo_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "176422357432-og79eimteb14o1ma0pug4c387pt0o9jf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDH-bXsPjHCmRVlUf9WkKic9Epu6Y52QGE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "176422357432-og79eimteb14o1ma0pug4c387pt0o9jf.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
