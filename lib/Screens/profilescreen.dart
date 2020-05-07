@@ -1,63 +1,112 @@
-import 'package:TodosApp/Screens/todosettings.dart';
+import 'dart:ui' as prefix0;
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'loginpage.dart';
 
-
-
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   final UserDetails detailsUser;
 
-  ProfileScreen({Key key, @required this.detailsUser}) : super(key: key);  
+  ProfileScreen({this.detailsUser});
+
+  @override
+  _ProfileScreenState createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  GoogleSignIn _gSignIn;
 
   @override
   Widget build(BuildContext context) {
-  final GoogleSignIn _gSignIn =  GoogleSignIn();
+    _gSignIn = GoogleSignIn();
+    print(widget.detailsUser.userName);
+    return buildPage(context);
+  }
 
-    return  Scaffold(
-        appBar:  AppBar(
-          title:  Text(detailsUser.userName),
-          automaticallyImplyLeading: false,
-          actions: <Widget>[
-          IconButton(
-            icon: Icon(
-              FontAwesomeIcons.signOutAlt,
-              size: 20.0,
-              color: Colors.white,
+  Scaffold buildPage(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("User's profile"),
+      ),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          Container(
+            height: 190,
+            padding: EdgeInsets.only(bottom: 10.0),
+            decoration: new BoxDecoration(
+                image: new DecorationImage(
+                    image: new NetworkImage(
+                        "https://s1.1zoom.me/big0/149/Norway_Sky_Aurora_Night_442507.jpg"),
+                    fit: BoxFit.cover)),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: <Widget>[
+                Container(
+                  width: 100,
+                  height: 100,
+                  decoration: BoxDecoration(
+                      image: new DecorationImage(
+                          image: new NetworkImage(widget.detailsUser.photoUrl),
+                          fit: BoxFit.cover),
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white, width: 4)),
+                  margin: EdgeInsets.only(bottom: 5.0),
+                ),
+                Text(
+                  widget.detailsUser.userName,
+                  style: TextStyle(color: Colors.white, fontSize: 17),
+                ),
+                Text(
+                  widget.detailsUser.userEmail,
+                  style: TextStyle(color: Colors.white, fontSize: 17),
+                ),
+              ],
             ),
-            onPressed: (){
-               _gSignIn.signOut();
-              print('Signed out');
-               Navigator.pop(context);
-             
-            },
           ),
+          Padding(
+              padding: EdgeInsets.only(top: 20),
+              child: Column(
+                children: <Widget>[
+                  RaisedButton(
+                    child: Text(
+                      "Sync todos at Google Cloud ",
+                    ),
+                    color: Colors.blue,
+                    onPressed: () {},
+                  ),
+                  RaisedButton(
+                    child: Text(
+                      "Log out",
+                    ),
+                    color: Colors.blue,
+                    onPressed: () {
+                      _gSignIn.signOut();
+                      navigateToLoginPage(context);
+                    },
+                  )
+                ],
+              )),
+          Padding(
+              padding: EdgeInsets.only(top: 20.0),
+              child: Row(
+                children: <Widget>[
+                  Icon(Icons.info),
+                  SizedBox(
+                    width: 5.0,
+                  ),
+                  Text(
+                    "We highly recommend to sync tasks regularly with Google Cloud",
+                    style: TextStyle(fontSize: 11),
+                  )
+                ],
+              ))
         ],
-        ),
-        body:Center(child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              CircleAvatar(
-                backgroundImage:NetworkImage(detailsUser.photoUrl),
-                radius: 50.0,
-              ),
-              SizedBox(height:10.0),
-               Text(
-                "Name : " + detailsUser.userName,
-                style:  TextStyle(fontWeight: FontWeight.bold, color: Colors.black,fontSize: 20.0),
-              ),
-              SizedBox(height:10.0),
-               Text(
-                "Email : " + detailsUser.userEmail,
-                style:  TextStyle(fontWeight: FontWeight.bold, color: Colors.black,fontSize: 20.0),
-              ),
-              SizedBox(height:10.0),
-              Text(
-                "Provider : " + detailsUser.providerDetails,
-                style:  TextStyle(fontWeight: FontWeight.bold, color: Colors.black,fontSize: 20.0),
-              ),
-            ],
-          ),)
-        );
+      ),
+    );
+  }
+
+  Future navigateToLoginPage(context) async {
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => LoginPage()));
   }
 }

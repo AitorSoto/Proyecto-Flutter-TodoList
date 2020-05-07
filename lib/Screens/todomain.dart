@@ -1,10 +1,12 @@
-import 'package:TodosApp/Screens/todolist.dart';
 import 'package:TodosApp/Screens/todospage.dart';
 import 'package:flutter/material.dart';
 
+import 'loginpage.dart';
+
 class TodoMain extends StatelessWidget {
   // This widget is the root of your application
-
+  UserDetails detailsUser;
+  TodoMain({this.detailsUser});
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -16,7 +18,7 @@ class TodoMain extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
+  MyHomePage({this.title});
 
   final String title;
 
@@ -25,6 +27,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  UserDetails detailsUsers;
   @override
   Widget build(BuildContext context) {
     return new Scaffold(

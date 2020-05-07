@@ -49,23 +49,8 @@ class TotoDetailState extends State {
     descriptionController.text = todo.description;
 
     return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        title: Text('Create Todo'),
-        /*actions: <Widget>[
-              PopupMenuButton<String>(
-                onSelected: select,
-                itemBuilder: (BuildContext context) {
-                  return choices.map((String choice) {
-                    return PopupMenuItem<String>(
-                      value: choice,
-                      child: Text(choice),
-                    );
-                  }).toList();
-                },
-              )
-            ],*/
-      ),
+      appBar:
+          AppBar(automaticallyImplyLeading: false, title: Text('Create Todo')),
       body: formTodo(), // Returns todo's form
     );
   }
@@ -261,7 +246,12 @@ class TotoDetailState extends State {
     var platformChannelSpecifics = NotificationDetails(
         androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
     await flutterLocalNotificationsPlugin.schedule(
-        0, title, description, dateNotificaction, platformChannelSpecifics,);
+      0,
+      title,
+      description,
+      dateNotificaction,
+      platformChannelSpecifics,
+    );
     showDialogMethod(
         "Success!",
         "Youll be notificated the day ${dateNotificaction.day}/${dateNotificaction.month}/${dateNotificaction.year} at " +

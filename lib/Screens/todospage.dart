@@ -36,6 +36,7 @@ class _TodosPageState extends State<TodosPage> {
   String _priority = "Low";
   bool searchingTodos = false;
   var focusNode = new FocusNode();
+  final choices = ["My Profile", "Sync with Google Cloud", "Log out"];
 
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
@@ -126,9 +127,19 @@ class _TodosPageState extends State<TodosPage> {
     TextStyle textStyleTitle = Theme.of(context).textTheme.title;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Search a todo"),
-      ),
+      appBar: AppBar(title: Text("Search a todo"), actions: <Widget>[
+        PopupMenuButton<String>(
+          onSelected: null,
+          itemBuilder: (BuildContext context) {
+            return choices.map((String choice) {
+              return PopupMenuItem<String>(
+                value: choice,
+                child: Text(choice),
+              );
+            }).toList();
+          },
+        )
+      ]),
       body: Column(
         children: <Widget>[
           Padding(
