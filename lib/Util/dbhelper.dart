@@ -31,10 +31,10 @@ class DbHelper {
   }
 
   Future<Database> initializeDb() async {
-    Directory dir = await getApplicationDocumentsDirectory();
-    String path = dir.path + "todos.db";
+    String path =
+        "/data/user/0/com.example.todo_app/app_flutter/database/app_fluttertodos.db";
     print(path);
-    var dbTodos = await openDatabase(path, version: 1, onCreate: _createDb);
+    var dbTodos = await openDatabase(path, version: 2, onCreate: _createDb);
     return dbTodos;
   }
 
@@ -101,6 +101,13 @@ class DbHelper {
     int result;
     var db = await this.db;
     result = await db.rawDelete("DELETE FROM $tblTodo WHERE $colId = $id");
+    return result;
+  }
+
+  Future<int> deleteTodos() async {
+    int result;
+    var db = await this.db;
+    result = await db.rawDelete("DELETE FROM $tblTodo");
     return result;
   }
 }

@@ -1,17 +1,23 @@
+import 'dart:io';
+
 import 'package:TodosApp/Model/todo.dart';
 import 'package:TodosApp/Screens/profilescreen.dart';
 import 'package:TodosApp/Screens/tododetail.dart';
-import 'package:TodosApp/Screens/todolist.dart';
 import 'package:TodosApp/Screens/todomain.dart';
 import 'package:TodosApp/Screens/todospage.dart';
+import 'package:TodosApp/Util/dbhelper.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.Dart';
-import 'package:google_sign_in/google_sign_in.dart';
+import 'package:http/http.dart' as http;
+import 'package:path_provider/path_provider.dart';
 
+import 'graphicspage.dart';
 import 'loginpage.dart';
 
 UserDetails details;
+DbHelper helper;
 void main() => runApp(MaterialApp(
         home: BottomNavBar(
       detailsUser: details,
@@ -30,7 +36,17 @@ class _BottomNavBarState extends State<BottomNavBar> {
   @override
   void initState() {
     super.initState();
-    profileScreen = ProfileScreen(detailsUser: detailsUserState);
+    helper = DbHelper();
+    StorageReference storageReference = FirebaseStorage.instance
+        .ref()
+        .getRoot()
+        .child(detailsUserState.userEmail)
+        .child("app_fluttertodos.db");
+    helper.initializeDb();
+    downloadFile(storageReference);
+
+    profileScreen =
+        ProfileScreen(detailsUser: detailsUserState, helper: helper);
   }
 
   _BottomNavBarState(this.detailsUserState);
@@ -40,8 +56,6 @@ class _BottomNavBarState extends State<BottomNavBar> {
   final TodoDetail todoDetail = TodoDetail(Todo('', 3, ''));
   final DataGraphic dataGraphic = DataGraphic();
   final TodosPage todosPage = TodosPage();
-
-  GoogleSignIn _gSignIn;
 
   Widget _showPage = new TodoMain();
   Widget _pageChooser(int page) {
@@ -114,5 +128,26 @@ class _BottomNavBarState extends State<BottomNavBar> {
   UserDetails getUserDetails() {
     var userDetail = detailsUserState;
     return userDetail;
+  }
+
+  Future<void> downloadFile(StorageReference reference) async {
+    final Directory dir = await getApplicationDocumentsDirectory();
+    //final File file =
+    //  File("/data/user/0/com.example.todo_app/app_fluttertodos.db ");
+    final File file = File("${dir.path}/database/app_fluttertodos.db");
+    print("---------> " + file.path);
+    String url;
+    try {
+      url = await reference.getDownloadURL();
+    } catch (PlattformException) {
+      await helper.deleteTodos();
+      return;
+    }
+    final http.Response downloadData = await http.get(url);
+    /*if (file.existsSync()) {
+      await file.delete();
+    }
+    file.create();*/
+    StorageFileDownloadTask task = reference.writeToFile(file);
   }
 }

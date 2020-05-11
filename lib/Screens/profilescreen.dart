@@ -1,12 +1,16 @@
-import 'dart:ui' as prefix0;
+import 'dart:io';
+import 'package:TodosApp/Util/dbhelper.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:path_provider/path_provider.dart';
 import 'loginpage.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class ProfileScreen extends StatefulWidget {
   final UserDetails detailsUser;
+  DbHelper helper;
 
-  ProfileScreen({this.detailsUser});
+  ProfileScreen({this.detailsUser, this.helper});
 
   @override
   _ProfileScreenState createState() => _ProfileScreenState();
@@ -14,6 +18,7 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   GoogleSignIn _gSignIn;
+  DbHelper helper;
 
   @override
   Widget build(BuildContext context) {
@@ -72,7 +77,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       "Sync todos at Google Cloud ",
                     ),
                     color: Colors.blue,
-                    onPressed: () {},
+                    onPressed: () {
+                      uploadFile(widget.detailsUser.userEmail);
+                    },
                   ),
                   RaisedButton(
                     child: Text(
@@ -80,8 +87,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                     color: Colors.blue,
                     onPressed: () {
-                      _gSignIn.signOut();
-                      navigateToLoginPage(context);
+                      uploadFile(widget.detailsUser.userEmail).then((_) =>
+                          _gSignIn
+                              .signOut()
+                              .then((_) => navigateToLoginPage(context)));
                     },
                   )
                 ],
@@ -108,5 +117,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future navigateToLoginPage(context) async {
     Navigator.push(
         context, MaterialPageRoute(builder: (context) => LoginPage()));
+  }
+
+  Future uploadFile(String emailUser) async {
+    final Directory dir = await getApplicationDocumentsDirectory();
+    final File file = File("${dir.path}/database/app_fluttertodos.db");
+    StorageReference storageReference =
+        FirebaseStorage.instance.ref().getRoot().child(emailUser);
+    StorageUploadTask uploadTask =
+        storageReference.child("app_fluttertodos.db").putFile(file);
+    await uploadTask.onComplete;
+    print('File Uploaded');
   }
 }

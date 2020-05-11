@@ -55,12 +55,6 @@ class _GoogleSignAppState extends State<GoogleSignApp> {
       userDetails.email,
       providerData,
     );
-    /*Navigator.push(
-      context,
-      new MaterialPageRoute(
-        builder: (context) => new ProfileScreen(detailsUser: details),
-      ),
-    );*/
     Navigator.push(
         context,
         new MaterialPageRoute(
