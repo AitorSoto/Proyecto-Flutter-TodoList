@@ -1,8 +1,8 @@
-import 'package:TodosApp/Screens/profilescreen.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:flare_flutter/flare_actor.dart';
 
 import 'bottomNavBar.dart';
 
@@ -69,99 +69,73 @@ class _GoogleSignAppState extends State<GoogleSignApp> {
         builder: (context) => Stack(
           fit: StackFit.expand,
           children: <Widget>[
-            Center(
-              child: Image.network(
-                  'https://images.unsplash.com/photo-1518050947974-4be8c7469f0c?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60',
-                  fit: BoxFit.fill,
-                  color: Color.fromRGBO(255, 255, 255, 0.6),
-                  colorBlendMode: BlendMode.modulate),
-            ),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                SizedBox(height: 10.0),
-                Container(
-                    width: 250.0,
-                    child: Align(
-                      alignment: Alignment.center,
-                      child: RaisedButton(
-                        shape: RoundedRectangleBorder(
-                            borderRadius: new BorderRadius.circular(30.0)),
-                        color: Color(0xffffffff),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: <Widget>[
-                            Icon(
-                              FontAwesomeIcons.google,
-                              color: Color(0xffCE107C),
+            FlareActor("assets/login.flr",
+                animation: "idle", fit: BoxFit.fitHeight),
+            Container(
+                alignment: Alignment.bottomCenter,
+                margin: EdgeInsets.only(bottom: 400),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Container(
+                        height: 150,
+                        width: 150,
+                        padding: EdgeInsets.only(top: -0),
+                        child: FlareActor(
+                          "assets/logo.flr",
+                          fit: BoxFit.fitWidth,
+                        )),
+                    Text(
+                      "Todo's List",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 50,
+                          fontWeight: FontWeight.bold),
+                    )
+                  ],
+                )),
+            Container(
+                alignment: Alignment.bottomCenter,
+                padding: EdgeInsets.only(top: 500, left: 10, right: 10),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Container(
+                        width: 250.0,
+                        padding: EdgeInsets.only(bottom: 100),
+                        child: Container(
+                          alignment: Alignment.topCenter,
+                          child: RaisedButton(
+                            shape: RoundedRectangleBorder(
+                                borderRadius: new BorderRadius.circular(30.0)),
+                            color: Color(0xffffffff),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: <Widget>[
+                                Image.network(
+                                    'https://media2.giphy.com/media/USnHNwXna1wxpG97fD/giphy.gif',
+                                    width: 50,
+                                    height: 50),
+                                SizedBox(width: 10.0),
+                                Text(
+                                  'Sign in with Google',
+                                  style: TextStyle(
+                                      color: Colors.black, fontSize: 18.0),
+                                ),
+                              ],
                             ),
-                            SizedBox(width: 10.0),
-                            Text(
-                              'Sign in with Google',
-                              style: TextStyle(
-                                  color: Colors.black, fontSize: 18.0),
-                            ),
-                          ],
-                        ),
-                        onPressed: () => _signIn(context)
-                            .then((FirebaseUser user) => print(user))
-                            .catchError((e) => print(e)),
-                      ),
-                    )),
-                Container(
-                    width: 250.0,
-                    child: Align(
-                      alignment: Alignment.center,
-                      child: RaisedButton(
-                        shape: RoundedRectangleBorder(
-                            borderRadius: new BorderRadius.circular(30.0)),
-                        color: Color(0xffffffff),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: <Widget>[
-                            Icon(
-                              FontAwesomeIcons.facebookF,
-                              color: Color(0xff4754de),
-                            ),
-                            SizedBox(width: 10.0),
-                            Text(
-                              'Sign in with Facebook',
-                              style: TextStyle(
-                                  color: Colors.black, fontSize: 18.0),
-                            ),
-                          ],
-                        ),
-                        onPressed: () {},
-                      ),
-                    )),
-                Container(
-                    width: 250.0,
-                    child: Align(
-                      alignment: Alignment.center,
-                      child: RaisedButton(
-                        shape: RoundedRectangleBorder(
-                            borderRadius: new BorderRadius.circular(30.0)),
-                        color: Color(0xffffffff),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: <Widget>[
-                            Icon(
-                              FontAwesomeIcons.solidEnvelope,
-                              color: Color(0xff4caf50),
-                            ),
-                            SizedBox(width: 10.0),
-                            Text(
-                              'Sign in with Email',
-                              style: TextStyle(
-                                  color: Colors.black, fontSize: 18.0),
-                            ),
-                          ],
-                        ),
-                        onPressed: () {},
-                      ),
-                    )),
-              ],
-            ),
+                            onPressed: () => _signIn(context)
+                                .then((FirebaseUser user) => print(user))
+                                .catchError((e) => print(e)),
+                          ),
+                        )),
+                    Text(
+                      "By loggin in you agreeing to our Terms & Conditions and Privacy Policy",
+                      textAlign: TextAlign.center,
+                    )
+                  ],
+                ))
           ],
         ),
       ),

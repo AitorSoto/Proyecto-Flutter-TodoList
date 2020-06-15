@@ -1,8 +1,10 @@
 import 'dart:io';
 import 'package:TodosApp/Util/dbhelper.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:share_social_media_plugin/share_social_media_plugin.dart';
 import 'loginpage.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
@@ -91,6 +93,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           _gSignIn
                               .signOut()
                               .then((_) => navigateToLoginPage(context)));
+                    },
+                  ),
+                  FloatingActionButton(
+                    tooltip: "Share the app with Instagram",
+                    backgroundColor: Colors.pink,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Icon(
+                          FontAwesomeIcons.instagram,
+                          color: Colors.white,
+                        ),
+                      ],
+                    ),
+                    onPressed: () async {
+                      await ShareSocialMediaPlugin.shareInstagram(
+                          "hello", "flutter_assets/finger.jpeg");
                     },
                   )
                 ],

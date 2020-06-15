@@ -41,6 +41,8 @@ class _TodosPageState extends State<TodosPage> {
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
 
+  GlobalKey<RefreshIndicatorState> refreshKey;
+
   @override
   Widget build(BuildContext context) {
     return searchWindow();
@@ -49,12 +51,19 @@ class _TodosPageState extends State<TodosPage> {
   @override
   void initState() {
     super.initState();
+    refreshKey = GlobalKey<RefreshIndicatorState>();
     {
       setState(() {
         todos = getData();
         filteredtodos = todos;
       });
     }
+  }
+
+  Future<Null> refreshList() async {
+    await Future.delayed(Duration(seconds: 2));
+    todos = getData();
+    return null;
   }
 
   List<Todo> getData() {
@@ -127,75 +136,68 @@ class _TodosPageState extends State<TodosPage> {
     TextStyle textStyleTitle = Theme.of(context).textTheme.title;
 
     return Scaffold(
-      appBar: AppBar(title: Text("Search a todo"), actions: <Widget>[
-        PopupMenuButton<String>(
-          onSelected: null,
-          itemBuilder: (BuildContext context) {
-            return choices.map((String choice) {
-              return PopupMenuItem<String>(
-                value: choice,
-                child: Text(choice),
-              );
-            }).toList();
+        appBar: AppBar(title: Text("Search a todo")),
+        body: RefreshIndicator(
+          key: refreshKey,
+          onRefresh: () async {
+            await refreshList();
           },
-        )
-      ]),
-      body: Column(
-        children: <Widget>[
-          Padding(
-              padding: EdgeInsets.all(10.0),
-              child: TextField(
-                  focusNode: focusNode,
-                  onEditingComplete: () =>
-                      FocusScope.of(context).requestFocus(focusNode),
-                  decoration: InputDecoration(
-                      labelText: "Search a todo by title or date",
-                      labelStyle: textStyleTitle,
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(5.0))),
-                  onChanged: (string) {
-                    _debouncer.run(() {
-                      setState(() {
-                        filteredtodos = todos
-                            .where((u) => (u.title
-                                    .toLowerCase()
-                                    .contains(string.toLowerCase()) ||
-                                u.date
-                                    .toLowerCase()
-                                    .contains(string.toLowerCase())))
-                            .toList();
-                      });
-                    });
-                  },
-                  onTap: () => setStateLists)),
-          Expanded(
-            child: ListView.builder(
-              padding: EdgeInsets.all(10.0),
-              itemCount: filteredtodos.length,
-              itemBuilder: (BuildContext context, int index) {
-                return Card(
-                    elevation: 2.0,
-                    child: GestureDetector(
-                      onTap: () {
-                        todo = this.filteredtodos[index];
-                        titleController.text = todo.title;
-                        descriptionController.text = todo.description;
-                        showDialog();
+          child: Column(
+            children: <Widget>[
+              Padding(
+                  padding: EdgeInsets.all(10.0),
+                  child: TextField(
+                      focusNode: focusNode,
+                      onEditingComplete: () =>
+                          FocusScope.of(context).requestFocus(focusNode),
+                      decoration: InputDecoration(
+                          labelText: "Search a todo by title or date",
+                          labelStyle: textStyleTitle,
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(5.0))),
+                      onChanged: (string) {
+                        _debouncer.run(() {
+                          setState(() {
+                            filteredtodos = todos
+                                .where((u) => (u.title
+                                        .toLowerCase()
+                                        .contains(string.toLowerCase()) ||
+                                    u.date
+                                        .toLowerCase()
+                                        .contains(string.toLowerCase())))
+                                .toList();
+                          });
+                        });
                       },
-                      child: ListTile(
-                        leading: CircleAvatar(
-                            backgroundColor:
-                                getColor(this.filteredtodos[index].priority)),
-                        title: Text(this.filteredtodos[index].title),
-                        subtitle: Text(this.filteredtodos[index].date),
-                      ),
-                    ));
-              },
-            ),
+                      onTap: () => setStateLists)),
+              Expanded(
+                child: ListView.builder(
+                  padding: EdgeInsets.all(10.0),
+                  itemCount: filteredtodos.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return Card(
+                        elevation: 2.0,
+                        child: GestureDetector(
+                          onTap: () {
+                            todo = this.filteredtodos[index];
+                            titleController.text = todo.title;
+                            descriptionController.text = todo.description;
+                            showDialog();
+                          },
+                          child: ListTile(
+                            leading: CircleAvatar(
+                                backgroundColor: getColor(
+                                    this.filteredtodos[index].priority)),
+                            title: Text(this.filteredtodos[index].title),
+                            subtitle: Text(this.filteredtodos[index].date),
+                          ),
+                        ));
+                  },
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
-    );
+        ));
   }
 
   void showDialog() {
