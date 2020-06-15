@@ -135,7 +135,7 @@ packages:
     source: hosted
     version: "2.3.4"
   flare_flutter:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: flare_flutter
       url: "https://pub.dartlang.org"
@@ -277,6 +277,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.4.0"
+  photo_view:
+    dependency: "direct main"
+    description:
+      name: photo_view
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.8.1"
   platform:
     dependency: transitive
     description:
@@ -298,6 +305,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.5"
+  random_string:
+    dependency: transitive
+    description:
+      name: random_string
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.0.2"
   rxdart:
     dependency: transitive
     description:
@@ -312,6 +326,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.2+2"
+  share_social_media_plugin:
+    dependency: "direct main"
+    description:
+      name: share_social_media_plugin
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.7"
   sky_engine:
     dependency: transitive
     description: flutter
