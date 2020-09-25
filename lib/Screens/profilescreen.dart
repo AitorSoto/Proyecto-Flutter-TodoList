@@ -1,12 +1,13 @@
 import 'dart:io';
+import 'package:TodosApp/Screens/webExplorer.dart';
 import 'package:TodosApp/Util/dbhelper.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:share_social_media_plugin/share_social_media_plugin.dart';
 import 'loginpage.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 
 class ProfileScreen extends StatefulWidget {
   final UserDetails detailsUser;
@@ -21,6 +22,7 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   GoogleSignIn _gSignIn;
   DbHelper helper;
+  WebViewContainer webViewContainer;
 
   @override
   Widget build(BuildContext context) {
@@ -95,23 +97,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               .then((_) => navigateToLoginPage(context)));
                     },
                   ),
-                  FloatingActionButton(
-                    tooltip: "Share the app with Instagram",
-                    backgroundColor: Colors.pink,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        Icon(
-                          FontAwesomeIcons.instagram,
-                          color: Colors.white,
-                        ),
-                      ],
-                    ),
-                    onPressed: () async {
-                      await ShareSocialMediaPlugin.shareInstagram(
-                          "hello", "flutter_assets/finger.jpeg");
-                    },
-                  )
                 ],
               )),
           Padding(
@@ -130,6 +115,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ))
         ],
       ),
+      floatingActionButton: SpeedDial(
+          animatedIcon: AnimatedIcons.menu_arrow,
+          tooltip: "Our social networks",
+          backgroundColor: Colors.blue,
+          children: [
+            SpeedDialChild(
+                child: Icon(
+                  FontAwesomeIcons.instagram,
+                  color: Colors.white,
+                ),
+                labelBackgroundColor: Colors.pink,
+                backgroundColor: Colors.pink,
+                label: "Follow us on Instagram",
+                onTap: () => handleURLButtonPress(
+                    context, "https://www.instagram.com/aitor_soto99/")),
+            SpeedDialChild(
+                child: Icon(
+                  FontAwesomeIcons.twitter,
+                  color: Colors.white,
+                ),
+                labelBackgroundColor: Colors.blueAccent,
+                backgroundColor: Colors.blueAccent,
+                label: "Follow us on Twitter",
+                onTap: () => handleURLButtonPress(
+                    context, "https://twitter.com/aitorsotojimnez?lang=es"))
+          ]),
     );
   }
 
@@ -147,5 +158,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
         storageReference.child("app_fluttertodos.db").putFile(file);
     await uploadTask.onComplete;
     print('File Uploaded');
+  }
+
+  void handleURLButtonPress(BuildContext context, String url) {
+    webViewContainer = WebViewContainer(url);
+    Navigator.push(context,
+        MaterialPageRoute(builder: (context) => WebViewContainer(url)));
   }
 }

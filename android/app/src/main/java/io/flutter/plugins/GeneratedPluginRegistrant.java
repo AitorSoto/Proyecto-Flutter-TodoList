@@ -9,8 +9,8 @@ import com.dexterous.flutterlocalnotifications.FlutterLocalNotificationsPlugin;
 import io.github.ponnamkarthik.toast.fluttertoast.FluttertoastPlugin;
 import io.flutter.plugins.googlesignin.GoogleSignInPlugin;
 import io.flutter.plugins.pathprovider.PathProviderPlugin;
-import social.share.com.share_social_media_plugin.ShareSocialMediaPlugin;
 import com.tekartik.sqflite.SqflitePlugin;
+import io.flutter.plugins.webviewflutter.WebViewFlutterPlugin;
 
 /**
  * Generated file. Do not edit.
@@ -28,8 +28,8 @@ public final class GeneratedPluginRegistrant {
     FluttertoastPlugin.registerWith(registry.registrarFor("io.github.ponnamkarthik.toast.fluttertoast.FluttertoastPlugin"));
     GoogleSignInPlugin.registerWith(registry.registrarFor("io.flutter.plugins.googlesignin.GoogleSignInPlugin"));
     PathProviderPlugin.registerWith(registry.registrarFor("io.flutter.plugins.pathprovider.PathProviderPlugin"));
-    ShareSocialMediaPlugin.registerWith(registry.registrarFor("social.share.com.share_social_media_plugin.ShareSocialMediaPlugin"));
     SqflitePlugin.registerWith(registry.registrarFor("com.tekartik.sqflite.SqflitePlugin"));
+    WebViewFlutterPlugin.registerWith(registry.registrarFor("io.flutter.plugins.webviewflutter.WebViewFlutterPlugin"));
   }
 
   private static boolean alreadyRegisteredWith(PluginRegistry registry) {

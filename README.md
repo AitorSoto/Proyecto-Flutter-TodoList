@@ -1,8 +1,8 @@
 # todo_app
 
-Proyecto de final de curso Desarrollo de Aplicaciones Multiplataforma
+A new Flutter project.
 
-# Proyecto en **desarrollo**
+## Getting Started
 
 This project is a starting point for a Flutter application.
 

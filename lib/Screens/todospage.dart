@@ -36,7 +36,6 @@ class _TodosPageState extends State<TodosPage> {
   String _priority = "Low";
   bool searchingTodos = false;
   var focusNode = new FocusNode();
-  final choices = ["My Profile", "Sync with Google Cloud", "Log out"];
 
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();

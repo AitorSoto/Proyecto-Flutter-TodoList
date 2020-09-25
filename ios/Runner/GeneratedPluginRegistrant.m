@@ -11,8 +11,8 @@
 #import <fluttertoast/FluttertoastPlugin.h>
 #import <google_sign_in/GoogleSignInPlugin.h>
 #import <path_provider/PathProviderPlugin.h>
-#import <share_social_media_plugin/ShareSocialMediaPlugin.h>
 #import <sqflite/SqflitePlugin.h>
+#import <webview_flutter/WebViewFlutterPlugin.h>
 
 @implementation GeneratedPluginRegistrant
 
@@ -25,8 +25,8 @@
   [FluttertoastPlugin registerWithRegistrar:[registry registrarForPlugin:@"FluttertoastPlugin"]];
   [FLTGoogleSignInPlugin registerWithRegistrar:[registry registrarForPlugin:@"FLTGoogleSignInPlugin"]];
   [FLTPathProviderPlugin registerWithRegistrar:[registry registrarForPlugin:@"FLTPathProviderPlugin"]];
-  [ShareSocialMediaPlugin registerWithRegistrar:[registry registrarForPlugin:@"ShareSocialMediaPlugin"]];
   [SqflitePlugin registerWithRegistrar:[registry registrarForPlugin:@"SqflitePlugin"]];
+  [FLTWebViewFlutterPlugin registerWithRegistrar:[registry registrarForPlugin:@"FLTWebViewFlutterPlugin"]];
 }
 
 @end
