@@ -47,6 +47,7 @@ class _GoogleSignAppState extends State<GoogleSignApp> {
 
     List<ProviderDetails> providerData = new List<ProviderDetails>();
     providerData.add(providerInfo);
+    await _firebaseAuth.currentUser();
 
     UserDetails details = new UserDetails(
       userDetails.providerId,
@@ -55,6 +56,7 @@ class _GoogleSignAppState extends State<GoogleSignApp> {
       userDetails.email,
       providerData,
     );
+
     Navigator.push(
         context,
         new MaterialPageRoute(

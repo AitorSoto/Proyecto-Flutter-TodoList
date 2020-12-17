@@ -48,6 +48,8 @@ class DbHelper {
 
   Future<int> insertTodo(Todo todo) async {
     Database db = await this.db;
+    /*var result = await db.rawInsert(
+        "INSERT INTO todo VALUES(null, '${todo.title}', '${todo.description}', ${todo.priority}, '${todo.date}')");*/
     var result = await db.insert(tblTodo, todo.toMap());
     return result;
   }
@@ -90,8 +92,10 @@ class DbHelper {
         todo.description +
         "', $colPriority = '" +
         todo.priority.toString() +
-        "' " +
-        "WHERE $colId = '" +
+        "', $colDate = '" +
+        todo.date +
+        "' "
+            "WHERE $colId = '" +
         todo.id.toString() +
         "'");
     return result;

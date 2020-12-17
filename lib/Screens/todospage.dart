@@ -3,7 +3,9 @@ import 'dart:async';
 import 'package:TodosApp/Model/todo.dart';
 import 'package:TodosApp/Util/dbhelper.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:slide_popup_dialog/slide_popup_dialog.dart' as slideDialog;
+import 'package:intl/intl.dart';
 
 class TodosPage extends StatefulWidget {
   @override
@@ -36,9 +38,11 @@ class _TodosPageState extends State<TodosPage> {
   String _priority = "Low";
   bool searchingTodos = false;
   var focusNode = new FocusNode();
+  DateTime dateReference = DateTime.now();
 
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
+  TextEditingController timeController = TextEditingController();
 
   GlobalKey<RefreshIndicatorState> refreshKey;
 
@@ -60,7 +64,6 @@ class _TodosPageState extends State<TodosPage> {
   }
 
   Future<Null> refreshList() async {
-    await Future.delayed(Duration(seconds: 2));
     todos = getData();
     return null;
   }
@@ -99,6 +102,36 @@ class _TodosPageState extends State<TodosPage> {
         return Colors.greenAccent;
         break;
     }
+  }
+
+  String getDateStringFormatted(DateTime date) {
+    // Instead of return for example 2020-12-05T02:02:00.000 this method will return Saturday, 5 of December at 02:02
+    String onlyDate = "";
+    String onlyTime = "";
+    String dateString = date.toString();
+    dateString.split(' ');
+    onlyDate = dateString[0];
+    onlyTime = dateString[1];
+    onlyTime.split(':');
+    String result = new DateFormat.MMMMEEEEd().format(date).toString() +
+        " at " +
+        date.toUtc().toIso8601String().split('T')[1].substring(0,
+            5); // With that 2020-12-05T02:02:00.000 turns to 02:02, here I just want to get the hour
+    return result;
+  }
+
+  Future<void> _showDateTimePicker() async {
+    DatePicker.showDateTimePicker(context,
+        showTitleActions: true,
+        minTime: DateTime.now(),
+        maxTime: DateTime(
+            dateReference.year + 2, dateReference.month, dateReference.day),
+        onConfirm: (date) {
+      String result;
+      result = getDateStringFormatted(date); //Date selected on the TimePicker
+      timeController.text = result;
+      todo.date = result;
+    }, locale: LocaleType.en);
   }
 
   void updatePriority(String value) {
@@ -181,6 +214,7 @@ class _TodosPageState extends State<TodosPage> {
                             todo = this.filteredtodos[index];
                             titleController.text = todo.title;
                             descriptionController.text = todo.description;
+                            timeController.text = todo.date;
                             showDialog();
                           },
                           child: ListTile(
@@ -188,7 +222,8 @@ class _TodosPageState extends State<TodosPage> {
                                 backgroundColor: getColor(
                                     this.filteredtodos[index].priority)),
                             title: Text(this.filteredtodos[index].title),
-                            subtitle: Text(this.filteredtodos[index].date),
+                            subtitle:
+                                Text(this.filteredtodos[index].date),
                           ),
                         ));
                   },
@@ -202,7 +237,7 @@ class _TodosPageState extends State<TodosPage> {
   void showDialog() {
     final _formKey = GlobalKey<FormState>();
     TextStyle textStyle = Theme.of(context).textTheme.title;
-    slideDialog.showSlideDialog(
+    /*slideDialog.showSlideDialog(
       context: context,
       backgroundColor: Color(0xFF39A9DB),
       child: Form(
@@ -233,6 +268,18 @@ class _TodosPageState extends State<TodosPage> {
                     border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(5.0))),
               ),
+            ),
+            Padding(
+              padding: EdgeInsets.all(8.0),
+              child: TextField(
+                  controller: timeController,
+                  style: textStyle,
+                  decoration: InputDecoration(
+                      labelText: "Date",
+                      labelStyle: textStyle,
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(5.0))),
+                  onTap: () => _showDateTimePicker()),
             ),
             Container(
                 width: 125,
@@ -276,6 +323,7 @@ class _TodosPageState extends State<TodosPage> {
                         if (todo.id != null) {
                           todo.title = titleController.text;
                           todo.description = descriptionController.text;
+                          todo.date = timeController.text;
                           result = await helper.updateTodo(todo);
                           setState(() {
                             todos = getData();
@@ -312,6 +360,129 @@ class _TodosPageState extends State<TodosPage> {
           ],
         ),
       ),
-    );
+    );*/
+    showModalBottomSheet(
+        context: context,
+        builder: (BuildContext bc) {
+          return Container(
+              height: MediaQuery.of(context).size.height * .60,
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Padding(
+                      padding: EdgeInsets.only(
+                          left: 8, top: 20, right: 8, bottom: 8),
+                      child: TextField(
+                        style: textStyle,
+                        controller: titleController,
+                        decoration: InputDecoration(
+                            labelText: "Title",
+                            labelStyle: textStyle,
+                            border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(5.0))),
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: TextField(
+                        controller: descriptionController,
+                        style: textStyle,
+                        decoration: InputDecoration(
+                            labelText: "Description",
+                            labelStyle: textStyle,
+                            border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(5.0))),
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: TextField(
+                          controller: timeController,
+                          style: textStyle,
+                          decoration: InputDecoration(
+                              labelText: "Date",
+                              labelStyle: textStyle,
+                              border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(5.0))),
+                          onTap: () => _showDateTimePicker()),
+                    ),
+                    Container(
+                        width: 125,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(5.0),
+                          border:
+                              Border.all(width: 1.0, color: textStyle.color),
+                        ),
+                        child: ListTile(
+                            title: DropdownButton<String>(
+                          style: textStyle,
+                          onChanged: (value) => updatePriority(value),
+                          items: _priorities
+                              .map<DropdownMenuItem<String>>((String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(value),
+                            );
+                          }).toList(),
+                          value: retrievePriority(todo.priority),
+                          icon: Icon(
+                            Icons.arrow_drop_down,
+                            size: 25.0,
+                            color: textStyle.color,
+                          ),
+                          iconSize: 24,
+                          elevation: 16,
+                        ))),
+                    Center(
+                        child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: <Widget>[
+                        Padding(
+                            padding: EdgeInsets.only(top: 30.0, right: 10.0),
+                            child: RaisedButton(
+                              onPressed: () async {
+                                int result;
+                                if (todo.id != null) {
+                                  todo.title = titleController.text;
+                                  todo.description = descriptionController.text;
+                                  todo.date = timeController.text;
+                                  result = await helper.updateTodo(todo);
+                                  setState(() {
+                                    todos = getData();
+                                    filteredtodos = todos;
+                                  });
+                                  Navigator.of(context).pop(context);
+                                }
+                              },
+                              child: Text("Update Todo"),
+                              color: Colors.blue,
+                            )),
+                        Padding(
+                            padding: EdgeInsets.only(top: 30.0),
+                            child: RaisedButton(
+                              onPressed: () async {
+                                int result;
+                                if (todo.id == null) {
+                                  return;
+                                }
+                                result = await helper.deleteTodo(todo.id);
+                                setState(() {
+                                  todos = getData();
+                                  filteredtodos = todos;
+                                });
+                                Navigator.of(context).pop(context);
+                              },
+                              child: Text("Delete Todo"),
+                              color: Colors.red,
+                            ))
+                      ],
+                    ))
+                  ],
+                ),
+              ));
+        });
   }
 }

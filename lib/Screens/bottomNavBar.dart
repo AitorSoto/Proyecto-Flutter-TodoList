@@ -32,7 +32,7 @@ class BottomNavBar extends StatefulWidget {
 
 class _BottomNavBarState extends State<BottomNavBar> {
   final UserDetails detailsUserState;
-  ProfileScreen profileScreen;
+  static ProfileScreen profileScreen;
   @override
   void initState() {
     super.initState();
@@ -45,19 +45,21 @@ class _BottomNavBarState extends State<BottomNavBar> {
     helper.initializeDb();
     downloadFile(storageReference);
 
-    profileScreen =
-        ProfileScreen(detailsUser: detailsUserState, helper: helper);
+    // profileScreen =
+    //     ProfileScreen(detailsUser: detailsUserState, helper: helper);
+    profileScreen = ProfileScreen(this.detailsUserState);
   }
 
   _BottomNavBarState(this.detailsUserState);
-  int pageIndex = 0;
+  int pageIndex = 1;
   GlobalKey _bottomNavigationKey = GlobalKey();
 
-  final TodoDetail todoDetail = TodoDetail(Todo('', 3, ''));
+  static final TodoDetail todoDetail =
+      TodoDetail(Todo('', 3, DateTime.now().toIso8601String(), ''));
   final DataGraphic dataGraphic = DataGraphic();
   final TodosPage todosPage = TodosPage();
 
-  Widget _showPage = new TodoMain();
+  Widget _showPage = todoDetail;
   Widget _pageChooser(int page) {
     switch (page) {
       case 0:
@@ -130,7 +132,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
     return userDetail;
   }
 
-  Future<void> downloadFile(StorageReference reference) async {
+  Future downloadFile(StorageReference reference) async {
     final Directory dir = await getApplicationDocumentsDirectory();
     //final File file =
     //  File("/data/user/0/com.example.todo_app/app_fluttertodos.db ");

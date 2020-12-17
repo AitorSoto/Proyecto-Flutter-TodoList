@@ -1,4 +1,3 @@
-import 'dart:ffi';
 import 'dart:typed_data';
 
 import 'package:TodosApp/Model/todo.dart';
@@ -31,8 +30,12 @@ class TotoDetailState extends State {
   String _priority = "Low";
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
-  DateTime date = DateTime.now(); // For datepicker
-  TimeOfDay time = TimeOfDay.now(); // For hourpicker
+  TextEditingController timeController = TextEditingController();
+  DateTime dateReference =
+      DateTime.now(); // Reference of the actual date and time
+  DateTime finalDate;
+
+  bool scheduleCheck = false; // Checkbox value
 
   final List<Key> keys = [
     Key("Network"),
@@ -47,6 +50,7 @@ class TotoDetailState extends State {
   Widget build(BuildContext context) {
     titleController.text = todo.title;
     descriptionController.text = todo.description;
+    timeController.text = "";
 
     return Scaffold(
       appBar:
@@ -55,10 +59,14 @@ class TotoDetailState extends State {
     );
   }
 
-  void save(bool showDialog) {
-    if (todo.title.isNotEmpty && todo.description.isNotEmpty) {
-      todo.date = new DateFormat.yMd().format(DateTime.now());
+  void save(bool showDialog, DateTime dateAndTime) {
+    if (todo.title.isNotEmpty &&
+        todo.description.isNotEmpty &&
+        timeController.text.isNotEmpty) {
+      todo.date = todo.date = getDateStringFormatted(finalDate);
       helper.insertTodo(todo).then((_) => cancelTodo());
+      if (scheduleCheck)
+        _scheduleNotification(todo.title, todo.description, finalDate);
       if (showDialog)
         showDialogMethod("Success!", "The todo was added successfully",
             "https://i.pinimg.com/originals/e8/06/52/e80652af2c77e3a73858e16b2ffe5f9a.gif");
@@ -99,6 +107,10 @@ class TotoDetailState extends State {
     todo.description = descriptionController.text;
   }
 
+  void updateDate() {
+    todo.date = new DateFormat.MMMMEEEEd().format(finalDate).toString();
+  }
+
   Padding formTodo() {
     TextStyle textStyle = Theme.of(context).textTheme.title;
     return Padding(
@@ -116,13 +128,26 @@ class TotoDetailState extends State {
                     borderRadius: BorderRadius.circular(5.0))),
           ),
           Padding(
-              padding: EdgeInsets.only(top: 15.0, bottom: 15.0),
+              padding: EdgeInsets.only(top: 15.0),
               child: TextField(
                 controller: descriptionController,
                 style: textStyle,
                 onChanged: (value) => this.updateDescription(),
                 decoration: InputDecoration(
                     labelText: "Description",
+                    labelStyle: textStyle,
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(5.0))),
+              )),
+          Padding(
+              padding: EdgeInsets.only(top: 15.0, bottom: 15.0),
+              child: TextField(
+                controller: timeController,
+                style: textStyle,
+                onTap: () => _showDateTimePicker(),
+                onChanged: (value) => this.updateDate(),
+                decoration: InputDecoration(
+                    labelText: "Set time",
                     labelStyle: textStyle,
                     border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(5.0))),
@@ -154,27 +179,43 @@ class TotoDetailState extends State {
                 iconSize: 24,
                 elevation: 16,
               ))),
+          Padding(
+              padding: EdgeInsets.only(top: 15.0),
+              child: Center(
+                  child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Checkbox(
+                    value: scheduleCheck,
+                    onChanged: (bool value) {
+                      setState(() {
+                        scheduleCheck = value;
+                      });
+                    },
+                  ),
+                  Text("Set a reminder")
+                ],
+              ))),
           Center(
               child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               Padding(
-                  padding: EdgeInsets.only(top: 30.0, right: 10.0),
+                  padding: EdgeInsets.only(right: 10.0),
                   child: RaisedButton(
-                    onPressed: () => save(true),
+                    onPressed: () => save(true, finalDate),
                     child: Text("Save Todo"),
                   )),
-              Padding(
-                  padding: EdgeInsets.only(top: 30.0),
-                  child: RaisedButton(
-                    onPressed: () => cancelTodo(),
-                    child: Text("Cancel Todo"),
-                    color: Colors.red,
-                  )),
+              RaisedButton(
+                onPressed: () => cancelTodo(),
+                child: Text("Cancel Todo"),
+                color: Colors.red,
+              ),
             ],
           )),
-          Center(
+          /*Center(
               child: RaisedButton(
             onPressed: () {
               if (titleController.text.isNotEmpty &&
@@ -188,7 +229,7 @@ class TotoDetailState extends State {
             },
             child: Text("Set a notification and save"),
             color: Colors.purple,
-          ))
+          ))*/
         ],
       ),
     );
@@ -219,10 +260,13 @@ class TotoDetailState extends State {
   }
 
   void cancelTodo() {
+    finalDate = DateTime.now();
     todo.title = "";
     todo.description = "";
+    todo.date = getDateStringFormatted(DateTime.now());
     titleController.text = "";
     descriptionController.text = "";
+    timeController.text = "";
   }
 
   Future<void> _scheduleNotification(
@@ -252,22 +296,42 @@ class TotoDetailState extends State {
       dateNotificaction,
       platformChannelSpecifics,
     );
+    dateReference = dateNotificaction; // => 2020-12-03T03:00:00.000
     showDialogMethod(
         "Success!",
         "Youll be notificated the day ${dateNotificaction.day}/${dateNotificaction.month}/${dateNotificaction.year} at " +
             "${dateNotificaction.hour}:${dateNotificaction.minute}. The todo has been saved",
         "https://1.bp.blogspot.com/-ng6yNqIKDJ4/VIIagImcDeI/AAAAAAAADlo/rjXhLx5Eyyc/s1600/c9bd7a16beae0bd10b56eb511434b73c.jpg");
-    save(false);
+    // save(false, dateNotificaction);
   }
 
   Future<void> _showDateTimePicker() async {
     DatePicker.showDateTimePicker(context,
         showTitleActions: true,
         minTime: DateTime.now(),
-        maxTime: DateTime(date.year + 2, date.month, date.day),
+        maxTime: DateTime(
+            dateReference.year + 2, dateReference.month, dateReference.day),
         onConfirm: (date) {
-      print("Confirmado $date");
-      _scheduleNotification(todo.title, todo.description, date);
+      String result;
+      result = getDateStringFormatted(date);
+      finalDate = date; //Date selected on the TimePicker
+      timeController.text = result;
     }, locale: LocaleType.en);
+  }
+
+  String getDateStringFormatted(DateTime date) {
+    // Instead of return for example 2020-12-05T02:02:00.000 this method will return Saturday, 5 of December at 02:02
+    String onlyDate = "";
+    String onlyTime = "";
+    String dateString = date.toString();
+    dateString.split(' ');
+    onlyDate = dateString[0];
+    onlyTime = dateString[1];
+    onlyTime.split(':');
+    String result = new DateFormat.MMMMEEEEd().format(date).toString() +
+        " at " +
+        date.toUtc().toIso8601String().split('T')[1].substring(0,
+            5); // With that 2020-12-05T02:02:00.000 turns to 02:02, here I just want to get the hour
+    return result;
   }
 }

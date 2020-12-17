@@ -13,7 +13,8 @@ class ProfileScreen extends StatefulWidget {
   final UserDetails detailsUser;
   DbHelper helper;
 
-  ProfileScreen({this.detailsUser, this.helper});
+  // ProfileScreen({this.detailsUser, this.helper});
+  ProfileScreen(this.detailsUser);
 
   @override
   _ProfileScreenState createState() => _ProfileScreenState();
@@ -21,7 +22,7 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   GoogleSignIn _gSignIn;
-  DbHelper helper;
+  //DbHelper helper;
   WebViewContainer webViewContainer;
 
   @override
@@ -102,6 +103,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           Padding(
               padding: EdgeInsets.only(top: 20.0),
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
                   Icon(Icons.info),
                   SizedBox(

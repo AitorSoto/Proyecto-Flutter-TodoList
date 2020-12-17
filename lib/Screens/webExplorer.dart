@@ -15,18 +15,17 @@ class _WebViewContainerState extends State<WebViewContainer> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      child: Scaffold(
-          appBar: AppBar(),
-          body: Column(
-            children: [
-              Expanded(
-                  child: WebView(
-                      key: _key,
-                      javascriptMode: JavascriptMode.unrestricted,
-                      initialUrl: _url))
-            ],
-          )),
+    return Scaffold(
+      appBar: AppBar(),
+      body: Column(
+        children: [
+          Expanded(
+              child: WebView(
+                  key: _key,
+                  javascriptMode: JavascriptMode.unrestricted,
+                  initialUrl: _url))
+        ],
+      ),
     );
   }
 }
