@@ -3,7 +3,6 @@ import 'dart:typed_data';
 import 'package:TodosApp/Model/todo.dart';
 import 'package:TodosApp/Util/dbhelper.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:intl/intl.dart';
 import 'package:TodosApp/Util/notificationmanager.dart';
@@ -63,11 +62,11 @@ class TotoDetailState extends State {
     if (todo.title.isNotEmpty &&
         todo.description.isNotEmpty &&
         timeController.text.isNotEmpty) {
-      todo.date = todo.date = getDateStringFormatted(finalDate);
+      todo.date = timeController.text;
       helper.insertTodo(todo).then((_) => cancelTodo());
       if (scheduleCheck)
         _scheduleNotification(todo.title, todo.description, finalDate);
-      if (showDialog)
+      else
         showDialogMethod("Success!", "The todo was added successfully",
             "https://i.pinimg.com/originals/e8/06/52/e80652af2c77e3a73858e16b2ffe5f9a.gif");
     } else {
@@ -299,24 +298,35 @@ class TotoDetailState extends State {
     dateReference = dateNotificaction; // => 2020-12-03T03:00:00.000
     showDialogMethod(
         "Success!",
-        "Youll be notificated the day ${dateNotificaction.day}/${dateNotificaction.month}/${dateNotificaction.year} at " +
-            "${dateNotificaction.hour}:${dateNotificaction.minute}. The todo has been saved",
+        "Youll be notificated ${getDateStringFormatted(finalDate)}. The todo has been saved",
         "https://1.bp.blogspot.com/-ng6yNqIKDJ4/VIIagImcDeI/AAAAAAAADlo/rjXhLx5Eyyc/s1600/c9bd7a16beae0bd10b56eb511434b73c.jpg");
     // save(false, dateNotificaction);
   }
 
-  Future<void> _showDateTimePicker() async {
-    DatePicker.showDateTimePicker(context,
-        showTitleActions: true,
-        minTime: DateTime.now(),
-        maxTime: DateTime(
-            dateReference.year + 2, dateReference.month, dateReference.day),
-        onConfirm: (date) {
-      String result;
-      result = getDateStringFormatted(date);
-      finalDate = date; //Date selected on the TimePicker
-      timeController.text = result;
-    }, locale: LocaleType.en);
+  _showDateTimePicker() async {
+    DateTime finalDateTime;
+    DateTime datePicked = await showDatePicker(
+        context: context,
+        initialDate: DateTime.now(),
+        initialDatePickerMode: DatePickerMode.day,
+        firstDate: DateTime(DateTime.now().year),
+        lastDate: DateTime(DateTime.now().year + 5));
+    if (datePicked != null) {
+      final TimeOfDay timePicked = await showTimePicker(
+        context: context,
+        initialTime:
+            TimeOfDay(hour: DateTime.now().hour, minute: DateTime.now().minute),
+      );
+      if (timePicked != null) {
+        finalDateTime = new DateTime(
+            datePicked.year,
+            datePicked.month,
+            datePicked.day,
+            timePicked.hour + 1,
+            timePicked.minute); // For some reason I get 1h less than selected
+        timeController.text = getDateStringFormatted(finalDateTime);
+      }
+    }
   }
 
   String getDateStringFormatted(DateTime date) {
@@ -329,6 +339,8 @@ class TotoDetailState extends State {
     onlyTime = dateString[1];
     onlyTime.split(':');
     String result = new DateFormat.MMMMEEEEd().format(date).toString() +
+        " of " +
+        date.year.toString() +
         " at " +
         date.toUtc().toIso8601String().split('T')[1].substring(0,
             5); // With that 2020-12-05T02:02:00.000 turns to 02:02, here I just want to get the hour

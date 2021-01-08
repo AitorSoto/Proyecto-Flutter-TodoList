@@ -3,16 +3,60 @@
 //
 
 #import "GeneratedPluginRegistrant.h"
+
+#if __has_include(<cloud_firestore/CloudFirestorePlugin.h>)
 #import <cloud_firestore/CloudFirestorePlugin.h>
+#else
+@import cloud_firestore;
+#endif
+
+#if __has_include(<firebase_auth/FirebaseAuthPlugin.h>)
 #import <firebase_auth/FirebaseAuthPlugin.h>
+#else
+@import firebase_auth;
+#endif
+
+#if __has_include(<firebase_core/FirebaseCorePlugin.h>)
 #import <firebase_core/FirebaseCorePlugin.h>
+#else
+@import firebase_core;
+#endif
+
+#if __has_include(<firebase_storage/FirebaseStoragePlugin.h>)
 #import <firebase_storage/FirebaseStoragePlugin.h>
+#else
+@import firebase_storage;
+#endif
+
+#if __has_include(<flutter_local_notifications/FlutterLocalNotificationsPlugin.h>)
 #import <flutter_local_notifications/FlutterLocalNotificationsPlugin.h>
-#import <fluttertoast/FluttertoastPlugin.h>
+#else
+@import flutter_local_notifications;
+#endif
+
+#if __has_include(<google_sign_in/GoogleSignInPlugin.h>)
 #import <google_sign_in/GoogleSignInPlugin.h>
+#else
+@import google_sign_in;
+#endif
+
+#if __has_include(<path_provider/PathProviderPlugin.h>)
 #import <path_provider/PathProviderPlugin.h>
+#else
+@import path_provider;
+#endif
+
+#if __has_include(<sqflite/SqflitePlugin.h>)
 #import <sqflite/SqflitePlugin.h>
+#else
+@import sqflite;
+#endif
+
+#if __has_include(<webview_flutter/WebViewFlutterPlugin.h>)
 #import <webview_flutter/WebViewFlutterPlugin.h>
+#else
+@import webview_flutter;
+#endif
 
 @implementation GeneratedPluginRegistrant
 
@@ -22,7 +66,6 @@
   [FLTFirebaseCorePlugin registerWithRegistrar:[registry registrarForPlugin:@"FLTFirebaseCorePlugin"]];
   [FLTFirebaseStoragePlugin registerWithRegistrar:[registry registrarForPlugin:@"FLTFirebaseStoragePlugin"]];
   [FlutterLocalNotificationsPlugin registerWithRegistrar:[registry registrarForPlugin:@"FlutterLocalNotificationsPlugin"]];
-  [FluttertoastPlugin registerWithRegistrar:[registry registrarForPlugin:@"FluttertoastPlugin"]];
   [FLTGoogleSignInPlugin registerWithRegistrar:[registry registrarForPlugin:@"FLTGoogleSignInPlugin"]];
   [FLTPathProviderPlugin registerWithRegistrar:[registry registrarForPlugin:@"FLTPathProviderPlugin"]];
   [SqflitePlugin registerWithRegistrar:[registry registrarForPlugin:@"SqflitePlugin"]];

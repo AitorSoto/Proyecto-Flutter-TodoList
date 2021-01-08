@@ -44,9 +44,6 @@ class _BottomNavBarState extends State<BottomNavBar> {
         .child("app_fluttertodos.db");
     helper.initializeDb();
     downloadFile(storageReference);
-
-    // profileScreen =
-    //     ProfileScreen(detailsUser: detailsUserState, helper: helper);
     profileScreen = ProfileScreen(this.detailsUserState);
   }
 
@@ -56,7 +53,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
 
   static final TodoDetail todoDetail =
       TodoDetail(Todo('', 3, DateTime.now().toIso8601String(), ''));
-  final DataGraphic dataGraphic = DataGraphic();
+  final DataGraphic dataGraphic = DataGraphic(helper);
   final TodosPage todosPage = TodosPage();
 
   Widget _showPage = todoDetail;
@@ -146,10 +143,6 @@ class _BottomNavBarState extends State<BottomNavBar> {
       return;
     }
     final http.Response downloadData = await http.get(url);
-    /*if (file.existsSync()) {
-      await file.delete();
-    }
-    file.create();*/
     StorageFileDownloadTask task = reference.writeToFile(file);
   }
 }

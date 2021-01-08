@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:TodosApp/Model/todo.dart';
 import 'package:TodosApp/Util/dbhelper.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:slide_popup_dialog/slide_popup_dialog.dart' as slideDialog;
 import 'package:intl/intl.dart';
 
@@ -63,9 +62,8 @@ class _TodosPageState extends State<TodosPage> {
     }
   }
 
-  Future<Null> refreshList() async {
+  Future<void> refreshList() async {
     todos = getData();
-    return null;
   }
 
   List<Todo> getData() {
@@ -114,24 +112,39 @@ class _TodosPageState extends State<TodosPage> {
     onlyTime = dateString[1];
     onlyTime.split(':');
     String result = new DateFormat.MMMMEEEEd().format(date).toString() +
+        " of " +
+        date.year.toString() +
         " at " +
         date.toUtc().toIso8601String().split('T')[1].substring(0,
             5); // With that 2020-12-05T02:02:00.000 turns to 02:02, here I just want to get the hour
     return result;
   }
 
-  Future<void> _showDateTimePicker() async {
-    DatePicker.showDateTimePicker(context,
-        showTitleActions: true,
-        minTime: DateTime.now(),
-        maxTime: DateTime(
-            dateReference.year + 2, dateReference.month, dateReference.day),
-        onConfirm: (date) {
-      String result;
-      result = getDateStringFormatted(date); //Date selected on the TimePicker
-      timeController.text = result;
-      todo.date = result;
-    }, locale: LocaleType.en);
+  _showDateTimePicker() async {
+    DateTime finalDateTime;
+    DateTime datePicked = await showDatePicker(
+        context: context,
+        initialDate: DateTime.now(),
+        initialDatePickerMode: DatePickerMode.day,
+        firstDate: DateTime(DateTime.now().year),
+        lastDate: DateTime(DateTime.now().year + 5));
+    if (datePicked != null) {
+      final TimeOfDay timePicked = await showTimePicker(
+        context: context,
+        initialTime:
+            TimeOfDay(hour: DateTime.now().hour, minute: DateTime.now().minute),
+      );
+      if (timePicked != null) {
+        finalDateTime = new DateTime(
+            datePicked.year,
+            datePicked.month,
+            datePicked.day,
+            timePicked.hour + 1,
+            timePicked.minute); // For some reason I get 1h less than selected
+        timeController.text = getDateStringFormatted(finalDateTime);
+        todo.date = timeController.text;
+      }
+    }
   }
 
   void updatePriority(String value) {
@@ -222,8 +235,7 @@ class _TodosPageState extends State<TodosPage> {
                                 backgroundColor: getColor(
                                     this.filteredtodos[index].priority)),
                             title: Text(this.filteredtodos[index].title),
-                            subtitle:
-                                Text(this.filteredtodos[index].date),
+                            subtitle: Text(this.filteredtodos[index].date),
                           ),
                         ));
                   },
@@ -237,130 +249,6 @@ class _TodosPageState extends State<TodosPage> {
   void showDialog() {
     final _formKey = GlobalKey<FormState>();
     TextStyle textStyle = Theme.of(context).textTheme.title;
-    /*slideDialog.showSlideDialog(
-      context: context,
-      backgroundColor: Color(0xFF39A9DB),
-      child: Form(
-        key: _formKey,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Padding(
-              padding: EdgeInsets.all(8.0),
-              child: TextField(
-                style: textStyle,
-                controller: titleController,
-                decoration: InputDecoration(
-                    labelText: "Title",
-                    labelStyle: textStyle,
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(5.0))),
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.all(8.0),
-              child: TextField(
-                controller: descriptionController,
-                style: textStyle,
-                decoration: InputDecoration(
-                    labelText: "Description",
-                    labelStyle: textStyle,
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(5.0))),
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.all(8.0),
-              child: TextField(
-                  controller: timeController,
-                  style: textStyle,
-                  decoration: InputDecoration(
-                      labelText: "Date",
-                      labelStyle: textStyle,
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(5.0))),
-                  onTap: () => _showDateTimePicker()),
-            ),
-            Container(
-                width: 125,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(5.0),
-                  border: Border.all(
-                      color: Colors.black,
-                      style: BorderStyle.solid,
-                      width: 1.0),
-                ),
-                child: ListTile(
-                    title: DropdownButton<String>(
-                  style: TextStyle(color: Colors.black, fontSize: 16.0),
-                  onChanged: (value) => updatePriority(value),
-                  items:
-                      _priorities.map<DropdownMenuItem<String>>((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
-                  value: retrievePriority(todo.priority),
-                  icon: Icon(
-                    Icons.arrow_drop_down,
-                    size: 25.0,
-                    color: Colors.white,
-                  ),
-                  iconSize: 24,
-                  elevation: 16,
-                ))),
-            Center(
-                child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                Padding(
-                    padding: EdgeInsets.only(top: 30.0, right: 10.0),
-                    child: RaisedButton(
-                      onPressed: () async {
-                        int result;
-                        if (todo.id != null) {
-                          todo.title = titleController.text;
-                          todo.description = descriptionController.text;
-                          todo.date = timeController.text;
-                          result = await helper.updateTodo(todo);
-                          setState(() {
-                            todos = getData();
-                            filteredtodos = todos;
-                          });
-                          Navigator.of(context, rootNavigator: true)
-                              .pop('dialog');
-                        }
-                      },
-                      child: Text("Update Todo"),
-                      color: Colors.blue,
-                    )),
-                Padding(
-                    padding: EdgeInsets.only(top: 30.0),
-                    child: RaisedButton(
-                      onPressed: () async {
-                        int result;
-                        if (todo.id == null) {
-                          return;
-                        }
-                        result = await helper.deleteTodo(todo.id);
-                        setState(() {
-                          todos = getData();
-                          filteredtodos = todos;
-                        });
-                        Navigator.of(context, rootNavigator: true)
-                            .pop('dialog');
-                      },
-                      child: Text("Delete Todo"),
-                      color: Colors.red,
-                    ))
-              ],
-            ))
-          ],
-        ),
-      ),
-    );*/
     showModalBottomSheet(
         context: context,
         builder: (BuildContext bc) {

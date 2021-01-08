@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:TodosApp/Screens/webExplorer.dart';
 import 'package:TodosApp/Util/dbhelper.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -8,12 +9,10 @@ import 'package:path_provider/path_provider.dart';
 import 'loginpage.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:achievement_view/achievement_view.dart';
 
 class ProfileScreen extends StatefulWidget {
   final UserDetails detailsUser;
-  DbHelper helper;
-
-  // ProfileScreen({this.detailsUser, this.helper});
   ProfileScreen(this.detailsUser);
 
   @override
@@ -22,9 +21,7 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   GoogleSignIn _gSignIn;
-  //DbHelper helper;
   WebViewContainer webViewContainer;
-
   @override
   Widget build(BuildContext context) {
     _gSignIn = GoogleSignIn();
@@ -83,7 +80,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                     color: Colors.blue,
                     onPressed: () {
-                      uploadFile(widget.detailsUser.userEmail);
+                      uploadFile(widget.detailsUser.userEmail)
+                          .then((_) => show(context));
                     },
                   ),
                   RaisedButton(
@@ -167,5 +165,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
     webViewContainer = WebViewContainer(url);
     Navigator.push(context,
         MaterialPageRoute(builder: (context) => WebViewContainer(url)));
+  }
+
+  void show(BuildContext context) {
+    AchievementView(
+      context,
+      icon: Icon(
+        FontAwesomeIcons.upload,
+        color: Colors.white,
+      ),
+      title: "Synchronized with cloud",
+      subTitle: "Nothing to see here ",
+      isCircle: true,
+      color: Colors.blue,
+      listener: (status) {
+        print(status);
+      },
+    )..show();
   }
 }
