@@ -12,12 +12,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.Dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'graphicspage.dart';
 import 'loginpage.dart';
 
 UserDetails details;
-DbHelper helper;
+//DbHelper helper;
 void main() => runApp(MaterialApp(
         home: BottomNavBar(
       detailsUser: details,
@@ -33,17 +34,19 @@ class BottomNavBar extends StatefulWidget {
 class _BottomNavBarState extends State<BottomNavBar> {
   final UserDetails detailsUserState;
   static ProfileScreen profileScreen;
+  Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
   @override
   void initState() {
     super.initState();
     helper = DbHelper();
+    String usuarioLogueado;
     StorageReference storageReference = FirebaseStorage.instance
         .ref()
         .getRoot()
         .child(detailsUserState.userEmail)
         .child("app_fluttertodos.db");
     helper.initializeDb();
-    downloadFile(storageReference);
+    checkEmail(this.detailsUserState.userEmail, storageReference);
     profileScreen = ProfileScreen(this.detailsUserState);
   }
 
@@ -52,8 +55,8 @@ class _BottomNavBarState extends State<BottomNavBar> {
   GlobalKey _bottomNavigationKey = GlobalKey();
 
   static final TodoDetail todoDetail =
-      TodoDetail(Todo('', 3, DateTime.now().toIso8601String(), ''));
-  final DataGraphic dataGraphic = DataGraphic(helper);
+      TodoDetail(Todo('', 3, DateTime.now().toIso8601String(), '', ''));
+  final DataGraphic dataGraphic = DataGraphic();
   final TodosPage todosPage = TodosPage();
 
   Widget _showPage = todoDetail;
@@ -98,7 +101,6 @@ class _BottomNavBarState extends State<BottomNavBar> {
                 Icon(Icons.add, size: 30),
                 Icon(Icons.graphic_eq, size: 30),
                 Icon(Icons.account_circle, size: 30),
-                //Icon(Icons.account_box, size: 30),
               ],
               color: Color(0xFF39A9DB),
               buttonBackgroundColor: Color(0xFF323BFF),
@@ -131,8 +133,6 @@ class _BottomNavBarState extends State<BottomNavBar> {
 
   Future downloadFile(StorageReference reference) async {
     final Directory dir = await getApplicationDocumentsDirectory();
-    //final File file =
-    //  File("/data/user/0/com.example.todo_app/app_fluttertodos.db ");
     final File file = File("${dir.path}/database/app_fluttertodos.db");
     print("---------> " + file.path);
     String url;
@@ -144,5 +144,16 @@ class _BottomNavBarState extends State<BottomNavBar> {
     }
     final http.Response downloadData = await http.get(url);
     StorageFileDownloadTask task = reference.writeToFile(file);
+  }
+
+  Future<void> checkEmail(
+    String emailLogued, StorageReference reference) async {
+    final SharedPreferences preferences = await _prefs;
+    if (!preferences.containsKey("email"))
+      preferences.setString("email", emailLogued);
+    if (preferences.getString("email") != emailLogued) {
+      downloadFile(reference);
+      preferences.setString("email", emailLogued);
+    }
   }
 }

@@ -26,7 +26,17 @@ class TotoDetailState extends State {
   Todo todo;
   TotoDetailState(this.todo);
   final _priorities = ["High", "Medium", "Low"];
+  final _tasks = [
+    "Leisure",
+    "Sports",
+    "Hang Out",
+    "Study",
+    "Vacations",
+    "Work",
+    "Others"
+  ];
   String _priority = "Low";
+  String _typeOfTask = "";
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
   TextEditingController timeController = TextEditingController();
@@ -62,6 +72,7 @@ class TotoDetailState extends State {
     if (todo.title.isNotEmpty &&
         todo.description.isNotEmpty &&
         timeController.text.isNotEmpty) {
+      todo.typeTodo = "Prueba";
       todo.date = timeController.text;
       helper.insertTodo(todo).then((_) => cancelTodo());
       if (scheduleCheck)
@@ -94,8 +105,30 @@ class TotoDetailState extends State {
     });
   }
 
+  void updateTypeOfTask(String value) {
+    todo.typeTodo = value;
+    setState(() {
+      _typeOfTask = value;
+    });
+  }
+
   String retrievePriority(int value) {
     return _priorities[value - 1];
+  }
+
+  String retrieveTypeOfTask(String value) {
+    return _tasks[findFirstMatchedIndex(value) - 1];
+  }
+
+  int findFirstMatchedIndex(String value) {
+    int index = 0;
+    for (int i = 0; i <= _tasks.length; i++) {
+      if (_tasks[i] == value) {
+        index = i;
+        break;
+      }
+    }
+    return index;
   }
 
   void updateTitle() {
@@ -178,6 +211,33 @@ class TotoDetailState extends State {
                 iconSize: 24,
                 elevation: 16,
               ))),
+          /*Container(
+              // TASK
+              width: 125,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(5.0),
+                border: Border.all(
+                    color: Colors.grey, style: BorderStyle.solid, width: 1.0),
+              ),
+              child: ListTile(
+                  title: DropdownButton<String>(
+                style: textStyle,
+                onChanged: (value) => updateTypeOfTask(value),
+                items: _tasks.map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+                value: retrieveTypeOfTask(todo.typeTodo),
+                icon: Icon(
+                  Icons.arrow_drop_down,
+                  size: 25.0,
+                  color: Colors.white,
+                ),
+                iconSize: 24,
+                elevation: 16,
+              ))),
           Padding(
               padding: EdgeInsets.only(top: 15.0),
               child: Center(
@@ -195,7 +255,7 @@ class TotoDetailState extends State {
                   ),
                   Text("Set a reminder")
                 ],
-              ))),
+              ))),*/
           Center(
               child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -214,21 +274,6 @@ class TotoDetailState extends State {
               ),
             ],
           )),
-          /*Center(
-              child: RaisedButton(
-            onPressed: () {
-              if (titleController.text.isNotEmpty &&
-                  titleController.text.isNotEmpty)
-                _showDateTimePicker();
-              else
-                showDialogMethod(
-                    "This man is looking where the money went, and like him, we are looking for what you want to be notified about.",
-                    "Tell us about you want to be notified by filling in the fields of title and description",
-                    "https://media1.tenor.com/images/859f1642b89fb829d2ff6a08d708b437/tenor.gif?itemid=13868803");
-            },
-            child: Text("Set a notification and save"),
-            color: Colors.purple,
-          ))*/
         ],
       ),
     );
@@ -298,7 +343,7 @@ class TotoDetailState extends State {
     dateReference = dateNotificaction; // => 2020-12-03T03:00:00.000
     showDialogMethod(
         "Success!",
-        "Youll be notificated ${getDateStringFormatted(finalDate)}. The todo has been saved",
+        "You'll be notificated ${getDateStringFormatted(finalDate)}. The todo has been saved",
         "https://1.bp.blogspot.com/-ng6yNqIKDJ4/VIIagImcDeI/AAAAAAAADlo/rjXhLx5Eyyc/s1600/c9bd7a16beae0bd10b56eb511434b73c.jpg");
     // save(false, dateNotificaction);
   }
@@ -330,7 +375,7 @@ class TotoDetailState extends State {
   }
 
   String getDateStringFormatted(DateTime date) {
-    // Instead of return for example 2020-12-05T02:02:00.000 this method will return Saturday, 5 of December at 02:02
+    // Instead of return for example 2020-12-05T02:02:00.000 this method will return Saturday, 5 of December at 02:02 of 2020
     String onlyDate = "";
     String onlyTime = "";
     String dateString = date.toString();

@@ -12,6 +12,7 @@ class DbHelper {
   String colDescription = "description";
   String colPriority = "priority";
   String colDate = "date";
+  String colTypeTodo = "typeTodo";
 
   String tblCategories = "categories";
   String colCategory = "category";
@@ -34,22 +35,20 @@ class DbHelper {
     String path =
         "/data/user/0/com.example.todo_app/app_flutter/database/app_fluttertodos.db";
     print(path);
-    var dbTodos = await openDatabase(path, version: 2, onCreate: _createDb);
+    var dbTodos = await openDatabase(path, version: 1, onCreate: _createDb);
     return dbTodos;
   }
 
   void _createDb(Database db, int newVersion) async {
     await db.execute(
         "CREATE TABLE $tblTodo($colId INTEGER PRIMARY KEY, $colTitle TEXT, " +
-            "$colDescription TEXT, $colPriority INTEGER, $colDate TEXT);" +
+            "$colDescription TEXT, $colPriority INTEGER, $colDate TEXT, $colTypeTodo TEXT);" +
             "CREATE TABLE $tblCategories($colCategory VARCHAR(50) PRIMARY KEY," +
-            "$colRepetitions INTEGER NOT NULL)");
+            "$colRepetitions INTEGER NOT NULL);");
   }
 
   Future<int> insertTodo(Todo todo) async {
     Database db = await this.db;
-    /*var result = await db.rawInsert(
-        "INSERT INTO todo VALUES(null, '${todo.title}', '${todo.description}', ${todo.priority}, '${todo.date}')");*/
     var result = await db.insert(tblTodo, todo.toMap());
     return result;
   }
