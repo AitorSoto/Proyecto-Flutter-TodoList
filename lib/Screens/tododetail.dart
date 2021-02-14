@@ -72,9 +72,9 @@ class TotoDetailState extends State {
     if (todo.title.isNotEmpty &&
         todo.description.isNotEmpty &&
         timeController.text.isNotEmpty) {
-      todo.typeTodo = "Prueba";
       todo.date = timeController.text;
       helper.insertTodo(todo).then((_) => cancelTodo());
+      helper.addRepetition(todo.typeTodo);
       if (scheduleCheck)
         _scheduleNotification(todo.title, todo.description, finalDate);
       else
@@ -106,9 +106,9 @@ class TotoDetailState extends State {
   }
 
   void updateTypeOfTask(String value) {
-    todo.typeTodo = value;
     setState(() {
       _typeOfTask = value;
+      todo.typeTodo = value;
     });
   }
 
@@ -117,7 +117,7 @@ class TotoDetailState extends State {
   }
 
   String retrieveTypeOfTask(String value) {
-    return _tasks[findFirstMatchedIndex(value) - 1];
+    return _tasks[findFirstMatchedIndex(value)];
   }
 
   int findFirstMatchedIndex(String value) {
@@ -194,7 +194,7 @@ class TotoDetailState extends State {
               child: ListTile(
                   title: DropdownButton<String>(
                 style: textStyle,
-                onChanged: (value) => updatePriority(value),
+                onChanged: (value) => this.updatePriority(value),
                 items:
                     _priorities.map<DropdownMenuItem<String>>((String value) {
                   return DropdownMenuItem<String>(
@@ -211,33 +211,37 @@ class TotoDetailState extends State {
                 iconSize: 24,
                 elevation: 16,
               ))),
-          /*Container(
-              // TASK
-              width: 125,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(5.0),
-                border: Border.all(
-                    color: Colors.grey, style: BorderStyle.solid, width: 1.0),
-              ),
-              child: ListTile(
-                  title: DropdownButton<String>(
-                style: textStyle,
-                onChanged: (value) => updateTypeOfTask(value),
-                items: _tasks.map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
-                value: retrieveTypeOfTask(todo.typeTodo),
-                icon: Icon(
-                  Icons.arrow_drop_down,
-                  size: 25.0,
-                  color: Colors.white,
-                ),
-                iconSize: 24,
-                elevation: 16,
-              ))),
+          Padding(
+              padding: EdgeInsets.only(top: 15.0, bottom: 15.0),
+              child: Container(
+                  // TASK
+                  width: 125,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(5.0),
+                    border: Border.all(
+                        color: Colors.grey,
+                        style: BorderStyle.solid,
+                        width: 1.0),
+                  ),
+                  child: ListTile(
+                      title: DropdownButton<String>(
+                    style: textStyle,
+                    onChanged: (value) => updateTypeOfTask(value),
+                    items: _tasks.map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                    value: retrieveTypeOfTask(todo.typeTodo),
+                    icon: Icon(
+                      Icons.arrow_drop_down,
+                      size: 25.0,
+                      color: Colors.white,
+                    ),
+                    iconSize: 24,
+                    elevation: 16,
+                  )))),
           Padding(
               padding: EdgeInsets.only(top: 15.0),
               child: Center(
@@ -255,7 +259,7 @@ class TotoDetailState extends State {
                   ),
                   Text("Set a reminder")
                 ],
-              ))),*/
+              ))),
           Center(
               child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -308,6 +312,7 @@ class TotoDetailState extends State {
     todo.title = "";
     todo.description = "";
     todo.date = getDateStringFormatted(DateTime.now());
+    todo.typeTodo = "Leisure";
     titleController.text = "";
     descriptionController.text = "";
     timeController.text = "";

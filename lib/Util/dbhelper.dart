@@ -1,8 +1,6 @@
 import 'package:TodosApp/Model/todo.dart';
 import 'package:sqflite/sqflite.dart';
 import 'dart:async';
-import 'dart:io';
-import 'package:path_provider/path_provider.dart';
 
 class DbHelper {
   static final DbHelper _dbTodosHelper = DbHelper._internal();
@@ -40,11 +38,26 @@ class DbHelper {
   }
 
   void _createDb(Database db, int newVersion) async {
-    await db.execute(
+    String todosCreationQuery =
+        "CREATE TABLE $tblTodo($colId INTEGER PRIMARY KEY, $colTitle TEXT, " +
+            "$colDescription TEXT, $colPriority INTEGER, $colDate TEXT, $colTypeTodo TEXT);" +
+            "CREATE TABLE $tblCategories($colCategory VARCHAR(50) PRIMARY KEY," +
+            "$colRepetitions INTEGER NOT NULL);";
+    String categoriesCreationQuery =
+        "CREATE TABLE $tblCategories($colCategory VARCHAR(50) PRIMARY KEY NOT NULL," +
+            "$colRepetitions INTEGER NOT NULL);";
+    var queries = [todosCreationQuery, categoriesCreationQuery];
+    for (String query in queries) {
+      db.execute(query);
+    }
+    /*await db.execute(
         "CREATE TABLE $tblTodo($colId INTEGER PRIMARY KEY, $colTitle TEXT, " +
             "$colDescription TEXT, $colPriority INTEGER, $colDate TEXT, $colTypeTodo TEXT);" +
             "CREATE TABLE $tblCategories($colCategory VARCHAR(50) PRIMARY KEY," +
             "$colRepetitions INTEGER NOT NULL);");
+    await db.execute(
+        "CREATE TABLE $tblCategories($colCategory VARCHAR(50) PRIMARY KEY ," +
+            "$colRepetitions INTEGER NOT NULL);");*/
   }
 
   Future<int> insertTodo(Todo todo) async {
@@ -73,17 +86,20 @@ class DbHelper {
     return result;
   }
 
-  Future<int> getCategoriesCount() async {
-    Database db = await this.db;
-    var result = Sqflite.firstIntValue(
-        await db.rawQuery("SELECT COUNT(*) FROM $tblCategories"));
-    return result;
-  }
-
-  // FALTA ACTUALIZAR LOS CAMPOS DE CATEGORIAS
-
   Future<int> updateTodo(Todo todo) async {
     var db = await this.db;
+    var queryCategory = await db.rawQuery(
+        "SELECT $colTypeTodo FROM $tblTodo WHERE id = '" +
+            todo.id.toString() +
+            "'");
+    String actualCategory = queryCategory.first.toString();
+
+    if (actualCategory != todo.typeTodo) {
+      // If the todo category changes to another one the category DB also changes adding and substracting a repetition
+      await addRepetition(todo.typeTodo);
+      await subtractRepetition(actualCategory);
+    }
+
     var result = await db.rawUpdate("UPDATE $tblTodo SET $colTitle = '" +
         todo.title +
         "', " +
@@ -93,6 +109,8 @@ class DbHelper {
         todo.priority.toString() +
         "', $colDate = '" +
         todo.date +
+        "', $colTypeTodo = '" +
+        todo.typeTodo +
         "' "
             "WHERE $colId = '" +
         todo.id.toString() +
@@ -107,10 +125,50 @@ class DbHelper {
     return result;
   }
 
+  Future<int> deleteCategories() async {
+    int result;
+    var db = await this.db;
+    result = await db.rawDelete("DELETE FROM $tblCategories");
+    return result;
+  }
+
   Future<int> deleteTodos() async {
     int result;
     var db = await this.db;
     result = await db.rawDelete("DELETE FROM $tblTodo");
+    return result;
+  }
+
+  Future<int> addRepetition(String category) async {
+    var db = await this.db;
+    int result;
+    int countCategory = Sqflite.firstIntValue(await db.rawQuery(
+        "SELECT COUNT(*) FROM $tblCategories WHERE category = '$category'"));
+    if (countCategory == 0 || countCategory == null)
+      result = await db
+          .rawInsert("INSERT INTO $tblCategories VALUES ('$category', 1)");
+    else
+      result = await db.rawUpdate(
+          "UPDATE $tblCategories SET repetitions = repetitions +1 WHERE category = '" +
+              category +
+              "'");
+    return result;
+  }
+
+  Future<int> subtractRepetition(String category) async {
+    var db = await this.db;
+    int result;
+    int countCategory = Sqflite.firstIntValue(await db.rawQuery(
+        "SELECT COUNT(*) FROM $tblCategories WHERE category = '$category'"));
+    if (countCategory == 1) //Last item on DB
+      await db.rawDelete(
+          "DELETE FROM $tblCategories WHERE categoria = '$category'");
+    else
+      result = await db.rawUpdate(
+          "UPDATE $tblCategories SET repetitions = repetitions -1 WHERE category = '" +
+              category +
+              "'");
+
     return result;
   }
 }

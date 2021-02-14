@@ -33,7 +33,17 @@ class _TodosPageState extends State<TodosPage> {
   DbHelper helper = DbHelper();
   Todo todo;
   int count = 0;
+  String _typeOfTask = "";
   final _priorities = ["High", "Medium", "Low"];
+  final _tasks = [
+    "Leisure",
+    "Sports",
+    "Hang Out",
+    "Study",
+    "Vacations",
+    "Work",
+    "Others"
+  ];
   String _priority = "Low";
   bool searchingTodos = false;
   var focusNode = new FocusNode();
@@ -177,6 +187,28 @@ class _TodosPageState extends State<TodosPage> {
     });
   }
 
+  void updateTypeOfTask(String value) {
+    setState(() {
+      _typeOfTask = value;
+      todo.typeTodo = value;
+    });
+  }
+
+  String retrieveTypeOfTask(String value) {
+    return _tasks[findFirstMatchedIndex(value)];
+  }
+
+  int findFirstMatchedIndex(String value) {
+    int index = 0;
+    for (int i = 0; i <= _tasks.length; i++) {
+      if (_tasks[i] == value) {
+        index = i;
+        break;
+      }
+    }
+    return index;
+  }
+
   Scaffold searchWindow() {
     TextStyle textStyleTitle = Theme.of(context).textTheme.title;
 
@@ -253,7 +285,7 @@ class _TodosPageState extends State<TodosPage> {
         context: context,
         builder: (BuildContext bc) {
           return Container(
-              height: MediaQuery.of(context).size.height * .60,
+              height: MediaQuery.of(context).size.height,
               child: Form(
                 key: _formKey,
                 child: Column(
@@ -296,33 +328,80 @@ class _TodosPageState extends State<TodosPage> {
                                   borderRadius: BorderRadius.circular(5.0))),
                           onTap: () => _showDateTimePicker()),
                     ),
-                    Container(
-                        width: 125,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(5.0),
-                          border:
-                              Border.all(width: 1.0, color: textStyle.color),
-                        ),
-                        child: ListTile(
-                            title: DropdownButton<String>(
-                          style: textStyle,
-                          onChanged: (value) => updatePriority(value),
-                          items: _priorities
-                              .map<DropdownMenuItem<String>>((String value) {
-                            return DropdownMenuItem<String>(
-                              value: value,
-                              child: Text(value),
-                            );
-                          }).toList(),
-                          value: retrievePriority(todo.priority),
-                          icon: Icon(
-                            Icons.arrow_drop_down,
-                            size: 25.0,
-                            color: textStyle.color,
-                          ),
-                          iconSize: 24,
-                          elevation: 16,
-                        ))),
+                    Padding(
+                        padding: EdgeInsets.only(top: 10.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Padding(
+                                padding: EdgeInsets.only(right: 10),
+                                child: Container(
+                                    width: 125,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(5.0),
+                                      border: Border.all(
+                                          width: 1.0, color: textStyle.color),
+                                    ),
+                                    child: ListTile(
+                                        title: DropdownButton<String>(
+                                      style: textStyle,
+                                      onChanged: (value) =>
+                                          updatePriority(value),
+                                      items: _priorities
+                                          .map<DropdownMenuItem<String>>(
+                                              (String value) {
+                                        return DropdownMenuItem<String>(
+                                          value: value,
+                                          child: Text(value),
+                                        );
+                                      }).toList(),
+                                      value: retrievePriority(todo.priority),
+                                      icon: Icon(
+                                        Icons.arrow_drop_down,
+                                        size: 25.0,
+                                        color: textStyle.color,
+                                      ),
+                                      iconSize: 24,
+                                      elevation: 16,
+                                    )))),
+                            Padding(
+                                padding:
+                                    EdgeInsets.only(top: 10.0, bottom: 10.0),
+                                child: Container(
+                                    // TASK
+                                    width: 125,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(5.0),
+                                      border: Border.all(
+                                          color: Colors.grey,
+                                          style: BorderStyle.solid,
+                                          width: 1.0),
+                                    ),
+                                    child: ListTile(
+                                        title: DropdownButton<String>(
+                                      style: textStyle,
+                                      onChanged: (value) =>
+                                          updateTypeOfTask(value),
+                                      items: _tasks
+                                          .map<DropdownMenuItem<String>>(
+                                              (String value) {
+                                        return DropdownMenuItem<String>(
+                                          value: value,
+                                          child: Text(value),
+                                        );
+                                      }).toList(),
+                                      value: retrieveTypeOfTask(todo.typeTodo),
+                                      icon: Icon(
+                                        Icons.arrow_drop_down,
+                                        size: 25.0,
+                                        color: Colors.white,
+                                      ),
+                                      iconSize: 24,
+                                      elevation: 16,
+                                    ))))
+                          ],
+                        )),
                     Center(
                         child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,

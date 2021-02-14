@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:TodosApp/Model/todo.dart';
 import 'package:TodosApp/Screens/profilescreen.dart';
 import 'package:TodosApp/Screens/tododetail.dart';
-import 'package:TodosApp/Screens/todomain.dart';
 import 'package:TodosApp/Screens/todospage.dart';
 import 'package:TodosApp/Util/dbhelper.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
@@ -38,16 +37,22 @@ class _BottomNavBarState extends State<BottomNavBar> {
   @override
   void initState() {
     super.initState();
-    helper = DbHelper();
-    String usuarioLogueado;
-    StorageReference storageReference = FirebaseStorage.instance
-        .ref()
-        .getRoot()
-        .child(detailsUserState.userEmail)
-        .child("app_fluttertodos.db");
-    helper.initializeDb();
-    checkEmail(this.detailsUserState.userEmail, storageReference);
-    profileScreen = ProfileScreen(this.detailsUserState);
+    try {
+      helper = DbHelper();
+      String usuarioLogueado;
+      StorageReference storageReference = FirebaseStorage.instance
+          .ref()
+          .getRoot()
+          .child(detailsUserState.userEmail)
+          .child("app_fluttertodos.db");
+      helper.initializeDb();
+      checkEmail(this.detailsUserState.userEmail, storageReference);
+      profileScreen = ProfileScreen(this.detailsUserState);
+    } catch (PlatformException) {
+      // When a new user logs into the app
+      helper.deleteTodos();
+      helper.deleteCategories();
+    }
   }
 
   _BottomNavBarState(this.detailsUserState);
@@ -55,7 +60,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
   GlobalKey _bottomNavigationKey = GlobalKey();
 
   static final TodoDetail todoDetail =
-      TodoDetail(Todo('', 3, DateTime.now().toIso8601String(), '', ''));
+      TodoDetail(Todo('', 3, DateTime.now().toIso8601String(), '', 'Leisure'));
   final DataGraphic dataGraphic = DataGraphic();
   final TodosPage todosPage = TodosPage();
 
@@ -140,6 +145,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
       url = await reference.getDownloadURL();
     } catch (PlattformException) {
       await helper.deleteTodos();
+      await helper.deleteCategories();
       return;
     }
     final http.Response downloadData = await http.get(url);
@@ -147,7 +153,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
   }
 
   Future<void> checkEmail(
-    String emailLogued, StorageReference reference) async {
+      String emailLogued, StorageReference reference) async {
     final SharedPreferences preferences = await _prefs;
     if (!preferences.containsKey("email"))
       preferences.setString("email", emailLogued);

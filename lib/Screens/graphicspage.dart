@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:TodosApp/Model/categories.dart';
 import 'package:TodosApp/Model/todo.dart';
 import 'package:TodosApp/Util/dbhelper.dart';
 import 'package:flutter/material.dart';
@@ -12,14 +13,14 @@ class DataGraphic extends StatefulWidget {
 }
 
 class _DataGraphictState extends State<DataGraphic> {
-  List<Todo> todos;
+  List<Categories> categories;
   DbHelper helper = new DbHelper();
   @override
   void initState() {
     super.initState();
     {
       setState(() {
-        todos = getData();
+        categories = getData();
       });
     }
   }
@@ -32,21 +33,21 @@ class _DataGraphictState extends State<DataGraphic> {
           title: ChartTitle(text: "Mucho texto"),
           legend: Legend(
               isVisible: true, overflowMode: LegendItemOverflowMode.wrap),
-          series: _getLegendDefaultSeries(todos),
+          series: _getLegendDefaultSeries(categories),
           tooltipBehavior: TooltipBehavior(enable: true),
         ));
   }
 
-  List<DoughnutSeries<Todo, String>> _getLegendDefaultSeries(
-      List<Todo> todoCharts) {
-    return <DoughnutSeries<Todo, String>>[
-      DoughnutSeries<Todo, String>(
-          dataSource: todoCharts,
+  List<DoughnutSeries<Categories, String>> _getLegendDefaultSeries(
+      List<Categories> categoriesCharts) {
+    //List<String> typesTodos = uniqueTypes();
+    return <DoughnutSeries<Categories, String>>[
+      DoughnutSeries<Categories, String>(
+          dataSource: categoriesCharts,
           legendIconType: LegendIconType.circle,
           enableSmartLabels: true,
-          xValueMapper: (Todo data, _) => data.date, //String
-          yValueMapper: (Todo data, _) =>
-              todos.where((e) => e.typeTodo == data.typeTodo).length, //Valor
+          xValueMapper: (Categories data, _) => data.category, //String
+          yValueMapper: (Categories data, _) => data.repetitions, //Valor
           startAngle: 90,
           endAngle: 90,
           dataLabelSettings: DataLabelSettings(
@@ -54,22 +55,29 @@ class _DataGraphictState extends State<DataGraphic> {
     ];
   }
 
-  List<Todo> getData() {
+  /*List<String> uniqueTypes() {
+    List<String> typesTodos = List<String>();
+    for (int i = 0; i <= categories.length; i++) typesTodos.add(categories[i].typeTodo);
+    typesTodos = typesTodos.toSet().toList();
+    return typesTodos;
+  }*/
+
+  List<Categories> getData() {
     final dbFuture = helper.initializeDb();
-    List<Todo> todoList = List<Todo>();
+    List<Categories> categoriesList = List<Categories>();
     dbFuture.then((result) {
-      final todosFuture = helper.getTodos();
+      final todosFuture = helper.getCategories();
       todosFuture.then((result) {
         int count = result.length;
         for (int i = 0; i < count; i++) {
-          todoList.add(Todo.fromObject(result[i]));
+          categoriesList.add(Categories.fromObject(result[i]));
         }
         setState(() {
-          todos = todoList;
+          categories = categoriesList;
           count = count;
         });
       });
     });
-    return todoList;
+    return categoriesList;
   }
 }
