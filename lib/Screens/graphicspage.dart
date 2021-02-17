@@ -1,11 +1,7 @@
-import 'dart:async';
-
 import 'package:TodosApp/Model/categories.dart';
-import 'package:TodosApp/Model/todo.dart';
 import 'package:TodosApp/Util/dbhelper.dart';
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
-import 'package:syncfusion_flutter_charts/sparkcharts.dart';
 
 class DataGraphic extends StatefulWidget {
   @override

@@ -40,6 +40,12 @@
 @import google_sign_in;
 #endif
 
+#if __has_include(<local_auth/FLTLocalAuthPlugin.h>)
+#import <local_auth/FLTLocalAuthPlugin.h>
+#else
+@import local_auth;
+#endif
+
 #if __has_include(<path_provider/PathProviderPlugin.h>)
 #import <path_provider/PathProviderPlugin.h>
 #else
@@ -73,6 +79,7 @@
   [FLTFirebaseStoragePlugin registerWithRegistrar:[registry registrarForPlugin:@"FLTFirebaseStoragePlugin"]];
   [FlutterLocalNotificationsPlugin registerWithRegistrar:[registry registrarForPlugin:@"FlutterLocalNotificationsPlugin"]];
   [FLTGoogleSignInPlugin registerWithRegistrar:[registry registrarForPlugin:@"FLTGoogleSignInPlugin"]];
+  [FLTLocalAuthPlugin registerWithRegistrar:[registry registrarForPlugin:@"FLTLocalAuthPlugin"]];
   [FLTPathProviderPlugin registerWithRegistrar:[registry registrarForPlugin:@"FLTPathProviderPlugin"]];
   [FLTSharedPreferencesPlugin registerWithRegistrar:[registry registrarForPlugin:@"FLTSharedPreferencesPlugin"]];
   [SqflitePlugin registerWithRegistrar:[registry registrarForPlugin:@"SqflitePlugin"]];

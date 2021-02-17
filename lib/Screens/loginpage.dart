@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flare_flutter/flare_actor.dart';
+import 'package:local_auth/local_auth.dart';
 
 import 'bottomNavBar.dart';
 
 void main() => runApp(LoginPage());
 
 class LoginPage extends StatelessWidget {
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -27,7 +26,14 @@ class _GoogleSignAppState extends State<GoogleSignApp> {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   final GoogleSignIn _googlSignIn = new GoogleSignIn();
 
+  final LocalAuthentication _localAuthentication = LocalAuthentication();
+  bool _hasFingerPrintSupport = false;
+  String _authorizedOrNot = "Not Authorized";
+  List<BiometricType> _availableBuimetricType = List<BiometricType>();
+
   Future<FirebaseUser> _signIn(BuildContext context) async {
+    await _authenticateMe();
+
     Scaffold.of(context).showSnackBar(new SnackBar(
       content: new Text('Sign in'),
     ));
@@ -62,6 +68,62 @@ class _GoogleSignAppState extends State<GoogleSignApp> {
         new MaterialPageRoute(
             builder: (context) => new BottomNavBar(detailsUser: details)));
     return userDetails;
+  }
+
+  Future<void> _getBiometricsSupport() async {
+    // this method checks whether your device has biometric support or not
+    bool hasFingerPrintSupport = false;
+    try {
+      hasFingerPrintSupport = await _localAuthentication.canCheckBiometrics;
+    } catch (e) {
+      print(e);
+    }
+    if (!mounted) return;
+    setState(() {
+      _hasFingerPrintSupport = hasFingerPrintSupport;
+    });
+  }
+
+  Future<void> _getAvailableSupport() async {
+    // this method fetches all the available biometric supports of the device
+    List<BiometricType> availableBuimetricType = List<BiometricType>();
+    try {
+      availableBuimetricType =
+          await _localAuthentication.getAvailableBiometrics();
+    } catch (e) {
+      print(e);
+    }
+    if (!mounted) return;
+    setState(() {
+      _availableBuimetricType = availableBuimetricType;
+    });
+  }
+
+  Future<void> _authenticateMe() async {
+    // this method opens a dialog for fingerprint authentication.
+    // we do not need to create a dialog nut it popsup from device natively.
+    bool authenticated = false;
+    try {
+      authenticated = await _localAuthentication.authenticateWithBiometrics(
+        localizedReason:
+            "Authenticate for login into the app", // message for dialog
+        useErrorDialogs: true, // show error in dialog
+        stickyAuth: true, // native process
+      );
+    } catch (e) {
+      print(e);
+    }
+    if (!mounted) return;
+    setState(() {
+      _authorizedOrNot = authenticated ? "Authorized" : "Not Authorized";
+    });
+  }
+
+  @override
+  void initState() {
+    _getBiometricsSupport();
+    _getAvailableSupport();
+    super.initState();
   }
 
   @override
@@ -104,11 +166,11 @@ class _GoogleSignAppState extends State<GoogleSignApp> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     Container(
-                        width: 250.0,
-                        padding: EdgeInsets.only(bottom: 100),
-                        child: Container(
-                          alignment: Alignment.topCenter,
-                          child: RaisedButton(
+                      width: 250.0,
+                      padding: EdgeInsets.only(bottom: 100),
+                      child: Container(
+                        alignment: Alignment.topCenter,
+                        child: RaisedButton(
                             shape: RoundedRectangleBorder(
                                 borderRadius: new BorderRadius.circular(30.0)),
                             color: Color(0xffffffff),
@@ -129,9 +191,9 @@ class _GoogleSignAppState extends State<GoogleSignApp> {
                             ),
                             onPressed: () => _signIn(context)
                                 .then((FirebaseUser user) => print(user))
-                                .catchError((e) => print(e)),
-                          ),
-                        )),
+                                .catchError((e) => print(e))),
+                      ),
+                    ),
                     Text(
                       "By loggin in you agreeing to our Terms & Conditions and Privacy Policy",
                       textAlign: TextAlign.center,
