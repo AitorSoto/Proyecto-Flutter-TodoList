@@ -113,7 +113,7 @@ class _TodosPageState extends State<TodosPage> {
   }
 
   String getDateStringFormatted(DateTime date) {
-    // Instead of return for example 2020-12-05T02:02:00.000 this method will return Saturday, 5 of December at 02:02
+    // Instead of return for example 2020-12-05T02:02:00.000 this method will return Saturday, 5 of December at 02:02 of 2020
     String onlyDate = "";
     String onlyTime = "";
     String dateString = date.toString();

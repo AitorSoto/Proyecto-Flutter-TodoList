@@ -26,7 +26,6 @@ class _DataGraphictState extends State<DataGraphic> {
     return Scaffold(
         appBar: AppBar(title: Text("Charts")),
         body: SfCircularChart(
-          title: ChartTitle(text: "Mucho texto"),
           legend: Legend(
               isVisible: true, overflowMode: LegendItemOverflowMode.wrap),
           series: _getLegendDefaultSeries(categories),
@@ -50,13 +49,6 @@ class _DataGraphictState extends State<DataGraphic> {
               isVisible: true, labelPosition: ChartDataLabelPosition.outside)),
     ];
   }
-
-  /*List<String> uniqueTypes() {
-    List<String> typesTodos = List<String>();
-    for (int i = 0; i <= categories.length; i++) typesTodos.add(categories[i].typeTodo);
-    typesTodos = typesTodos.toSet().toList();
-    return typesTodos;
-  }*/
 
   List<Categories> getData() {
     final dbFuture = helper.initializeDb();

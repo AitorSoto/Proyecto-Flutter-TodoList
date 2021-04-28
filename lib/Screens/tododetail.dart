@@ -35,11 +35,11 @@ class TotoDetailState extends State {
     "Work",
     "Others"
   ];
+  String dateValue = "Set a day and time for your todo";
   String _priority = "Low";
   String _typeOfTask = "";
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
-  TextEditingController timeController = TextEditingController();
   DateTime dateReference =
       DateTime.now(); // Reference of the actual date and time
   DateTime finalDate;
@@ -59,7 +59,6 @@ class TotoDetailState extends State {
   Widget build(BuildContext context) {
     titleController.text = todo.title;
     descriptionController.text = todo.description;
-    timeController.text = "";
 
     return Scaffold(
       appBar:
@@ -71,8 +70,7 @@ class TotoDetailState extends State {
   void save(bool showDialog, DateTime dateAndTime) {
     if (todo.title.isNotEmpty &&
         todo.description.isNotEmpty &&
-        timeController.text.isNotEmpty) {
-      todo.date = timeController.text;
+        dateValue != "Set a day and time for your todo") {
       helper.insertTodo(todo).then((_) => cancelTodo());
       helper.addRepetition(todo.typeTodo);
       if (scheduleCheck)
@@ -172,17 +170,26 @@ class TotoDetailState extends State {
                         borderRadius: BorderRadius.circular(5.0))),
               )),
           Padding(
-              padding: EdgeInsets.only(top: 15.0, bottom: 15.0),
-              child: TextField(
-                controller: timeController,
-                style: textStyle,
-                onTap: () => _showDateTimePicker(),
-                onChanged: (value) => this.updateDate(),
-                decoration: InputDecoration(
-                    labelText: "Set time",
-                    labelStyle: textStyle,
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(5.0))),
+              padding: EdgeInsets.only(top: 10.0, bottom: 15.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Padding(
+                      padding: EdgeInsets.only(top: 10.0),
+                      child: Text(
+                        dateValue,
+                        style: textStyle,
+                      )),
+                  Padding(
+                    padding: EdgeInsets.only(top: 10.0),
+                    child: RaisedButton(
+                      onPressed: () => _showDateTimePicker(),
+                      child: Text("Set time and day "),
+                      color: Colors.purple,
+                    ),
+                  )
+                ],
               )),
           Container(
               width: 125,
@@ -315,7 +322,9 @@ class TotoDetailState extends State {
     todo.typeTodo = "Leisure";
     titleController.text = "";
     descriptionController.text = "";
-    timeController.text = "";
+    setState(() {
+      dateValue = "Set a day and time for your todo";
+    });
   }
 
   Future<void> _scheduleNotification(
@@ -374,7 +383,11 @@ class TotoDetailState extends State {
             datePicked.day,
             timePicked.hour + 1,
             timePicked.minute); // For some reason I get 1h less than selected
-        timeController.text = getDateStringFormatted(finalDateTime);
+        //timeController.text = getDateStringFormatted(finalDateTime);
+        setState(() {
+          dateValue = getDateStringFormatted(finalDateTime);
+          todo.date = dateValue;
+        });
       }
     }
   }

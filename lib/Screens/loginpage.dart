@@ -33,41 +33,47 @@ class _GoogleSignAppState extends State<GoogleSignApp> {
 
   Future<FirebaseUser> _signIn(BuildContext context) async {
     await _authenticateMe();
+    if (_authorizedOrNot == "Not Authorized") {
+      Scaffold.of(context).showSnackBar(new SnackBar(
+        content: new Text('Sign in canceled by user'),
+      ));
+    } else {
+      Scaffold.of(context).showSnackBar(new SnackBar(
+        content: new Text('Sign in'),
+      ));
 
-    Scaffold.of(context).showSnackBar(new SnackBar(
-      content: new Text('Sign in'),
-    ));
+      final GoogleSignInAccount googleUser = await _googlSignIn.signIn();
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
 
-    final GoogleSignInAccount googleUser = await _googlSignIn.signIn();
-    final GoogleSignInAuthentication googleAuth =
-        await googleUser.authentication;
+      final AuthCredential credential = GoogleAuthProvider.getCredential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
 
-    final AuthCredential credential = GoogleAuthProvider.getCredential(
-      accessToken: googleAuth.accessToken,
-      idToken: googleAuth.idToken,
-    );
+      FirebaseUser userDetails =
+          await _firebaseAuth.signInWithCredential(credential);
+      ProviderDetails providerInfo =
+          new ProviderDetails(userDetails.providerId);
 
-    FirebaseUser userDetails =
-        await _firebaseAuth.signInWithCredential(credential);
-    ProviderDetails providerInfo = new ProviderDetails(userDetails.providerId);
+      List<ProviderDetails> providerData = new List<ProviderDetails>();
+      providerData.add(providerInfo);
+      await _firebaseAuth.currentUser();
 
-    List<ProviderDetails> providerData = new List<ProviderDetails>();
-    providerData.add(providerInfo);
-    await _firebaseAuth.currentUser();
+      UserDetails details = new UserDetails(
+        userDetails.providerId,
+        userDetails.displayName,
+        userDetails.photoUrl,
+        userDetails.email,
+        providerData,
+      );
 
-    UserDetails details = new UserDetails(
-      userDetails.providerId,
-      userDetails.displayName,
-      userDetails.photoUrl,
-      userDetails.email,
-      providerData,
-    );
-
-    Navigator.push(
-        context,
-        new MaterialPageRoute(
-            builder: (context) => new BottomNavBar(detailsUser: details)));
-    return userDetails;
+      Navigator.push(
+          context,
+          new MaterialPageRoute(
+              builder: (context) => new BottomNavBar(detailsUser: details)));
+      return userDetails;
+    }
   }
 
   Future<void> _getBiometricsSupport() async {

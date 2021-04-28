@@ -1,3 +1,4 @@
+import 'package:TodosApp/Model/reminders.dart';
 import 'package:TodosApp/Model/todo.dart';
 import 'package:sqflite/sqflite.dart';
 import 'dart:async';
@@ -15,6 +16,10 @@ class DbHelper {
   String tblCategories = "categories";
   String colCategory = "category";
   String colRepetitions = "repetitions";
+
+  String tblReminders = "reminders";
+  String colHour = "reminderHour";
+  String colNameNotification = "reminderName";
 
   DbHelper._internal();
 
@@ -46,18 +51,13 @@ class DbHelper {
     String categoriesCreationQuery =
         "CREATE TABLE $tblCategories($colCategory VARCHAR(50) PRIMARY KEY NOT NULL," +
             "$colRepetitions INTEGER NOT NULL);";
-    var queries = [todosCreationQuery, categoriesCreationQuery];
+    String remindersQuery =
+        "CREATE TABLE $tblReminders(id INTEGER NOT NULL PRIMARY KEY, $colNameNotification VARCHAR(50) NOT NULL," +
+            "$colHour VARCHAR(5) NOT NULL);";
+    var queries = [todosCreationQuery, categoriesCreationQuery, remindersQuery];
     for (String query in queries) {
       db.execute(query);
     }
-    /*await db.execute(
-        "CREATE TABLE $tblTodo($colId INTEGER PRIMARY KEY, $colTitle TEXT, " +
-            "$colDescription TEXT, $colPriority INTEGER, $colDate TEXT, $colTypeTodo TEXT);" +
-            "CREATE TABLE $tblCategories($colCategory VARCHAR(50) PRIMARY KEY," +
-            "$colRepetitions INTEGER NOT NULL);");
-    await db.execute(
-        "CREATE TABLE $tblCategories($colCategory VARCHAR(50) PRIMARY KEY ," +
-            "$colRepetitions INTEGER NOT NULL);");*/
   }
 
   Future<int> insertTodo(Todo todo) async {
@@ -76,6 +76,12 @@ class DbHelper {
   Future<List> getCategories() async {
     Database db = await this.db;
     var result = await db.rawQuery("SELECT * FROM $tblCategories");
+    return result;
+  }
+
+  Future<List> getReminders() async {
+    Database db = await this.db;
+    var result = await db.rawQuery("SELECT * FROM $tblReminders");
     return result;
   }
 
@@ -169,6 +175,41 @@ class DbHelper {
               category +
               "'");
 
+    return result;
+  }
+
+  Future<int> insertReminder(Reminders reminder) async {
+    Database db = await this.db;
+    var result = await db.insert(tblReminders, reminder.toMap());
+    return result;
+  }
+
+  Future<int> getLastReminderId() async {
+    var db = await this.db;
+    int result = Sqflite.firstIntValue(
+        await db.rawQuery("SELECT MAX(ID) FROM $tblReminders"));
+    return result == null ? 0 : result + 1;
+  }
+
+  Future<int> updateReminder(Reminders reminder) async {
+    var db = await this.db;
+    var result =
+        await db.rawUpdate("UPDATE $tblReminders SET $colNameNotification = '" +
+            reminder.reminderName +
+            "', " +
+            "$colHour = '" +
+            reminder.reminderHour +
+            "' "
+                "WHERE id = '" +
+            reminder.id.toString() +
+            "'");
+    return result;
+  }
+
+  Future<int> deleteReminder(int id) async {
+    int result;
+    var db = await this.db;
+    result = await db.rawDelete("DELETE FROM $tblReminders WHERE id = $id");
     return result;
   }
 }

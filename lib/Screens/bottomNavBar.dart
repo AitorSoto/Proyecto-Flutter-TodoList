@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:TodosApp/Model/todo.dart';
+import 'package:TodosApp/Screens/dailyNotifications.dart';
 import 'package:TodosApp/Screens/profilescreen.dart';
 import 'package:TodosApp/Screens/tododetail.dart';
 import 'package:TodosApp/Screens/todospage.dart';
@@ -63,6 +64,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
       TodoDetail(Todo('', 3, DateTime.now().toIso8601String(), '', 'Leisure'));
   final DataGraphic dataGraphic = DataGraphic();
   final TodosPage todosPage = TodosPage();
+  final DailyNotification dailyNotificationPage = DailyNotification();
 
   Widget _showPage = todoDetail;
   Widget _pageChooser(int page) {
@@ -74,9 +76,12 @@ class _BottomNavBarState extends State<BottomNavBar> {
         return todoDetail;
         break;
       case 2:
-        return dataGraphic;
+        return dailyNotificationPage;
         break;
       case 3:
+        return dataGraphic;
+        break;
+      case 4:
         return profileScreen;
         break;
       default:
@@ -104,6 +109,10 @@ class _BottomNavBarState extends State<BottomNavBar> {
               items: <Widget>[
                 Icon(Icons.list, size: 30),
                 Icon(Icons.add, size: 30),
+                Icon(
+                  Icons.calendar_today_outlined,
+                  size: 30,
+                ),
                 Icon(Icons.graphic_eq, size: 30),
                 Icon(Icons.account_circle, size: 30),
               ],
