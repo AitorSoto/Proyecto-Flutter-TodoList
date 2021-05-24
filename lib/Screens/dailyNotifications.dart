@@ -4,6 +4,9 @@ import 'package:TodosApp/Util/notificationmanager.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:giffy_dialog/giffy_dialog.dart';
+import 'package:achievement_view/achievement_view.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:dcdg/dcdg.dart';
 
 class DailyNotificationMain extends StatelessWidget {
   @override
@@ -83,7 +86,7 @@ class _DailyNotificationState extends State<DailyNotification> {
                         showDialogMethod(
                             "Something is not fine",
                             "You have to declare an hour and a title for your reminder, we'd like to be fortune-teller, but we are not",
-                            "https://media.tenor.com/images/3913923a4af61672e4be57ee67977fdb/tenor.gif");
+                            "assets/notOk.gif");
                       } else {
                         int newId = await helper.getLastReminderId();
                         int hour =
@@ -109,7 +112,7 @@ class _DailyNotificationState extends State<DailyNotification> {
                         showDialogMethod(
                             "Clue, look up!",
                             "Exactly, everithing went right. The reminder was saved and you will be notificated everyday by now",
-                            "https://media1.tenor.com/images/3b76a7f4cc2271c641369ad2bfb300a5/tenor.gif?itemid=10340659");
+                            "assets/stanleyOk.gif");
                       }
                     },
                   ),
@@ -144,13 +147,13 @@ class _DailyNotificationState extends State<DailyNotification> {
         ));
   }
 
-  void showDialogMethod(String title, String description, String urlGif) {
+  void showDialogMethod(String title, String description, String route) {
     showDialog(
         context: context,
-        builder: (_) => NetworkGiffyDialog(
-              key: Key("Network"),
-              image: Image.network(
-                urlGif,
+        builder: (_) => AssetGiffyDialog(
+              key: Key("Asset"),
+              image: Image.asset(
+                route,
                 fit: BoxFit.cover,
               ),
               entryAnimation: EntryAnimation.TOP_LEFT,
@@ -305,5 +308,22 @@ class _DailyNotificationState extends State<DailyNotification> {
                 ),
               ));
         });
+  }
+
+  void show(BuildContext context) {
+    AchievementView(
+      context,
+      icon: Icon(
+        FontAwesomeIcons.upload,
+        color: Colors.white,
+      ),
+      title: "Synchronized with cloud",
+      subTitle: "Nothing to see here ",
+      isCircle: true,
+      color: Colors.blue,
+      listener: (status) {
+        print(status);
+      },
+    )..show();
   }
 }

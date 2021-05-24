@@ -1,3 +1,4 @@
+import 'package:dcdg/dcdg.dart';
 class Categories {
   String _category;
   int _repetitions;

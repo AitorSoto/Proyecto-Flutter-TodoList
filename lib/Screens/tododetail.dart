@@ -7,6 +7,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:intl/intl.dart';
 import 'package:TodosApp/Util/notificationmanager.dart';
 import 'package:giffy_dialog/giffy_dialog.dart';
+import 'package:dcdg/dcdg.dart';
 
 DbHelper helper = DbHelper();
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
@@ -67,14 +68,16 @@ class TotoDetailState extends State {
     );
   }
 
-  void save(bool showDialog, DateTime dateAndTime) {
+  Future<void> save(bool showDialog, DateTime dateAndTime) async {
     if (todo.title.isNotEmpty &&
         todo.description.isNotEmpty &&
         dateValue != "Set a day and time for your todo") {
       helper.insertTodo(todo).then((_) => cancelTodo());
       helper.addRepetition(todo.typeTodo);
+      int id = await helper.getLastIdFromTodos();
       if (scheduleCheck)
-        _scheduleNotification(todo.title, todo.description, finalDate);
+        _scheduleNotification(id, todo.title, todo.description,
+            dateAndTime); //error aqui hulio la fecha y el id son nulos, para el id un metodo que lo recupere de la BD y para lo otro ni idea :D
       else
         showDialogMethod("Success!", "The todo was added successfully",
             "https://i.pinimg.com/originals/e8/06/52/e80652af2c77e3a73858e16b2ffe5f9a.gif");
@@ -327,14 +330,13 @@ class TotoDetailState extends State {
     });
   }
 
-  Future<void> _scheduleNotification(
-      String title, String description, DateTime dateNotificaction) async {
+  Future<void> _scheduleNotification(int id, String title, String description,
+      DateTime dateNotificaction) async {
     var vibrationPattern = Int64List(4);
     vibrationPattern[0] = 0;
     vibrationPattern[1] = 1000;
     vibrationPattern[2] = 5000;
     vibrationPattern[3] = 2000;
-
     var androidPlatformChannelSpecifics = AndroidNotificationDetails(
         '1', 'Todos channel', 'Alternative Todos channel',
         vibrationPattern: vibrationPattern,
@@ -348,18 +350,15 @@ class TotoDetailState extends State {
     var platformChannelSpecifics = NotificationDetails(
         androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
     await flutterLocalNotificationsPlugin.schedule(
-      0,
-      title,
-      description,
-      dateNotificaction,
-      platformChannelSpecifics,
-    );
-    dateReference = dateNotificaction; // => 2020-12-03T03:00:00.000
+        id,
+        title,
+        description,
+        dateNotificaction,
+        platformChannelSpecifics); // => 2020-12-03T03:00:00.000
     showDialogMethod(
-        "Success!",
-        "You'll be notificated ${getDateStringFormatted(finalDate)}. The todo has been saved",
-        "https://1.bp.blogspot.com/-ng6yNqIKDJ4/VIIagImcDeI/AAAAAAAADlo/rjXhLx5Eyyc/s1600/c9bd7a16beae0bd10b56eb511434b73c.jpg");
-    // save(false, dateNotificaction);
+        "You'll be notificated!",
+        "The todo was added successfully",
+        "https://media1.tenor.com/images/f56b4465b5256065b07103d49d058eac/tenor.gif");
   }
 
   _showDateTimePicker() async {
@@ -383,7 +382,6 @@ class TotoDetailState extends State {
             datePicked.day,
             timePicked.hour + 1,
             timePicked.minute); // For some reason I get 1h less than selected
-        //timeController.text = getDateStringFormatted(finalDateTime);
         setState(() {
           dateValue = getDateStringFormatted(finalDateTime);
           todo.date = dateValue;
@@ -401,11 +399,12 @@ class TotoDetailState extends State {
     onlyDate = dateString[0];
     onlyTime = dateString[1];
     onlyTime.split(':');
+    // Here I get 1 hour less
     String result = new DateFormat.MMMMEEEEd().format(date).toString() +
         " of " +
         date.year.toString() +
         " at " +
-        date.toUtc().toIso8601String().split('T')[1].substring(0,
+        date.toIso8601String().split('T')[1].substring(0,
             5); // With that 2020-12-05T02:02:00.000 turns to 02:02, here I just want to get the hour
     return result;
   }

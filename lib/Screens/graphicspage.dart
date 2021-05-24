@@ -2,6 +2,7 @@ import 'package:TodosApp/Model/categories.dart';
 import 'package:TodosApp/Util/dbhelper.dart';
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
+import 'package:dcdg/dcdg.dart';
 
 class DataGraphic extends StatefulWidget {
   @override
@@ -35,7 +36,6 @@ class _DataGraphictState extends State<DataGraphic> {
 
   List<DoughnutSeries<Categories, String>> _getLegendDefaultSeries(
       List<Categories> categoriesCharts) {
-    //List<String> typesTodos = uniqueTypes();
     return <DoughnutSeries<Categories, String>>[
       DoughnutSeries<Categories, String>(
           dataSource: categoriesCharts,

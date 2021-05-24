@@ -2,6 +2,7 @@ import 'package:TodosApp/Model/reminders.dart';
 import 'package:TodosApp/Model/todo.dart';
 import 'package:sqflite/sqflite.dart';
 import 'dart:async';
+import 'package:dcdg/dcdg.dart';
 
 class DbHelper {
   static final DbHelper _dbTodosHelper = DbHelper._internal();
@@ -71,6 +72,13 @@ class DbHelper {
     var result =
         await db.rawQuery("SELECT * FROM $tblTodo ORDER BY $colPriority");
     return result;
+  }
+
+  Future<int> getLastIdFromTodos() async {
+    var db = await this.db;
+    int result = Sqflite.firstIntValue(
+        await db.rawQuery("SELECT MAX(ID) FROM $tblTodo"));
+    return result == null ? 0 : result;
   }
 
   Future<List> getCategories() async {
@@ -200,9 +208,8 @@ class DbHelper {
             "$colHour = '" +
             reminder.reminderHour +
             "' "
-                "WHERE id = '" +
-            reminder.id.toString() +
-            "'");
+                "WHERE id = " +
+            reminder.id.toString());
     return result;
   }
 

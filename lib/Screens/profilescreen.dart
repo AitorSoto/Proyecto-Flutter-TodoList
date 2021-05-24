@@ -9,6 +9,7 @@ import 'loginpage.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:achievement_view/achievement_view.dart';
+import 'package:dcdg/dcdg.dart';
 
 class ProfileScreen extends StatefulWidget {
   final UserDetails detailsUser;

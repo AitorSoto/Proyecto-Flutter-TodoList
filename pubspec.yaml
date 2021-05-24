@@ -10,6 +10,7 @@ dependencies:
   flutter:
     sdk: flutter
   sqflite: any
+  dcdg: ^2.0.1
   path_provider: any
   intl: ^0.15.7
   curved_navigation_bar: ^0.3.2
@@ -22,7 +23,7 @@ dependencies:
   search_app_bar: ^1.0.2+2
   dropdown_banner: ^1.4.0
   dart_notification_center: ^1.0.0+1
-  giffy_dialog: ^1.7.0
+  giffy_dialog: ^1.8.0
   font_awesome_flutter: ^8.8.1
   firebase_storage:
   cloud_firestore:

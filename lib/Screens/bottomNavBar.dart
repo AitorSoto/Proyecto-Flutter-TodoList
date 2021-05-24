@@ -13,6 +13,7 @@ import 'package:flutter/services.Dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:dcdg/dcdg.dart';
 
 import 'graphicspage.dart';
 import 'loginpage.dart';
