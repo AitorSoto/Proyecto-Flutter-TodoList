@@ -76,8 +76,7 @@ class TotoDetailState extends State {
       helper.addRepetition(todo.typeTodo);
       int id = await helper.getLastIdFromTodos();
       if (scheduleCheck)
-        _scheduleNotification(id, todo.title, todo.description,
-            dateAndTime); //error aqui hulio la fecha y el id son nulos, para el id un metodo que lo recupere de la BD y para lo otro ni idea :D
+        _scheduleNotification(id, todo.title, todo.description, dateAndTime);
       else
         showDialogMethod("Success!", "The todo was added successfully",
             "https://i.pinimg.com/originals/e8/06/52/e80652af2c77e3a73858e16b2ffe5f9a.gif");
